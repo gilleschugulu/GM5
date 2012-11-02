@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "Mobile Gaming News": {
+            "applicationId": "HGoHF8NOmWIM8P3XjhcNcRi0euFsiiiRTV0dzkE3", 
+            "masterKey": "k1PmFhGwNAN10jcUSG7WGirOIQ0TfHlwh4ZLnVWt"
+        }, 
+        "_default": {
+            "link": "Mobile Gaming News"
+        }
+    }, 
+    "global": {
+        "parseVersion": "1.1.7"
+    }
+}
