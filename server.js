@@ -1,4 +1,5 @@
 var express = require('express');
+var path		= require('path');
 
 // Create app server
 var app = express();
@@ -7,7 +8,7 @@ var app = express();
 app.listen(process.env.PORT || 3333);
 
 // If static asset requested, serve it directly
-app.get('/*.(css|js|png|jpg)', function(request, response) {
+app.get('/*.(css|js|png|jpg|gif)', function(request, response) {
   response.sendfile('public/' + request.path);
 });
 
