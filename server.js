@@ -1,3 +1,11 @@
-var statik = require('statik');
-var server = statik.createServer();
-server.listen(process.env.PORT || 1337);
+var express = require('express');
+var app = express();
+
+app.listen(process.env.PORT || 3333);
+app.get('/*.(css|js|png|jpg)', function(request, response) {
+  response.sendfile('public/' + request.path);
+});
+app.get('/*', function(request, response) {
+  response.sendfile('public/index.html');
+});
+
