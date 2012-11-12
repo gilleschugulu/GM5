@@ -1,0 +1,157 @@
+
+<!-- Shall we move this somewhere more appropriate? -->
+<script src="/tiny_mce/jquery.tinymce.js"></script>
+
+<form class="form-horizontal">
+  <legend>{{title}}</legend>
+  <label>Rubrique</label>
+  {{#each sections}}
+	  <label class="radio inline">
+      {{#isSelectedSection this}}
+        <input type="radio" name="input-section" value="{{id}}" checked> {{attributes.name}}
+      {{else}}
+		  	<input type="radio" name="input-section" value="{{id}}"> {{attributes.name}}
+      {{/isSelectedSection}}
+	  </label>
+  {{/each}}
+  <br />
+  <br />
+	<label>URL origine</label>
+	<input class="input-xxlarge" type="text" id="input-origin-url" value="{{news.attributes.originUrl}}">
+  <br />
+  <br />
+  <label>Tag</label>
+  <input class="input-xxlarge" type="text" id="input-tags" value="{{news.attributes.tags}}">
+  <br />
+  <br />
+  <div class="row">
+  	<div class="span2">
+  		<label>Categorie</label>
+  		<select class="span2" id="input-category">
+        {{#each categories.items}}
+          {{#isSelectedCategory this}}
+            <option value="{{value}}" selected>{{name}}</option>      
+          {{else}}
+            <option value="{{value}}">{{name}}</option>      
+          {{/isSelectedCategory}}
+        {{/each}}
+  		</select>
+  	</div>
+  	<div class="span2">
+  		<label>Importance</label>
+  		<select class="span2" id="input-priority">
+        {{#each priorities.items}}
+          {{#isSelectedPriority this}}
+            <option value="{{value}}" selected>{{name}}</option>      
+          {{else}}
+            <option value="{{value}}">{{name}}</option>      
+          {{/isSelectedPriority}}
+        {{/each}}
+  		</select>
+  	</div>
+  	<div class="span2">
+  		<label>Langue</label>
+  		<select class="span2" id="input-lang">
+        {{#each languages.items}}
+          {{#isSelectedLanguage this}}
+            <option value="{{value}}" selected>{{name}}</option>      
+          {{else}}
+            <option value="{{value}}">{{name}}</option>      
+          {{/isSelectedLanguage}}
+        {{/each}}
+  		</select>
+  	</div>
+  	<div class="span2">
+  		<label>Source</label>
+  		<select class="span2" id="input-source">
+        <option value="">Selectioner</option>
+  			{{#each sources}}
+          {{#isSelectedSource this}}
+            <option value="{{id}}" selected>{{attributes.name}}</option>      
+          {{else}}
+            <option value="{{id}}">{{attributes.name}}</option>      
+          {{/isSelectedSource}}
+  			{{/each}}
+  		</select>
+  	</div>
+  </div>
+  <br />
+  <div class="row">
+    <div class="span7">
+      <label>Titre</label>
+      <input class="span7" type="text" id="input-title" value="{{news.attributes.title}}">
+    </div>
+  </div>
+  <br />
+  <div class="row">
+    <div class="span5">
+      <label>Image associe au titre</label>
+      <input type="file" id="input-news-image">
+      <img id="input-news-image-preview" src="{{newsImage}}" alt="News image preview" />
+    </div>
+  </div>
+  <br>
+  <div class="row">
+  	<div class="span12">
+  		<label>Description</label>
+  		<textarea id="input-description" rows="15" cols="80">{{news.attributes.description}}</textarea>
+  	</div>
+  </div>
+  <br>
+  <div class="row">
+  	<div class="span6">
+  		<label>Nom de l'application</label>
+		  <input class="span6" type="text" id="input-application-name" value="{{news.attributes.applicationName}}">
+  	</div>
+  	<div class="span2">
+	 		<label>App Store Id</label>
+	  	<input type="text" id="input-application-appstore-id" class="span2" id="input-application-appstore-id" value="{{news.attributes.applicationAppStoreId}}">
+  	</div>
+  </div>
+  <br />
+  <div class="row">
+    <div class="span4">
+      <label>Icon</label>
+      <input type="file" id="input-application-icon">
+      <img id="input-application-icon-preview" src="{{applicationIconUrl}}" alt="Application's icon preview" />
+    </div>
+  </div>
+  <br>
+  <div class="row">
+  	<div class="span6">
+	 		<label>Type du jeu</label>
+	  	<input class="span6" type="text" id="input-application-type" value="{{news.attributes.applicationType}}">
+  	</div>
+  	<div class="span2">
+	 		<label>Version</label>
+	  	<input type="text" id="input-application-version" class="span2" value="{{news.attributes.applicationVersion}}">
+  	</div>
+  </div>  
+  <br />
+  <div class="row">
+  	<div class="span1">
+	 		<label>Prix</label>
+      <div class="input-append">
+        <input class="span1" id="input-application-price" type="text" style="text-align:right" value="{{news.attributes.applicationPrice}}">
+        <span class="add-on">€</span>
+      </div>
+  	</div>
+  	<div class="span2">
+	 		<label>Note</label>
+      <div class="input-append">
+        <input class="span1" id="input-application-ranking" type="text" style="text-align:right" value="{{news.attributes.applicationRanking}}">
+        <span class="add-on">/5</span>
+      </div>
+  	</div>
+  </div>
+  <br>
+  <div class="row">
+  	<div class="span12">
+      {{#if news.id}}
+        <button type="button" class="btn btn-large btn-block btn-primary" id="submit-button">Edit News!</button>
+      {{else}}
+        <button type="button" class="btn btn-large btn-block btn-primary" id="submit-button">Create News!</button>
+      {{/if}}
+  	</div>
+  </div>
+</form>
