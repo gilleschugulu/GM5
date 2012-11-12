@@ -1917,14 +1917,15 @@ window.require.define({"views/news_view": function(exports, require, module) {
     };
 
     NewsView.prototype.reload_data = function() {
-      var news, _i, _len, _ref;
+      var news, _i, _len, _ref, _results;
       $("#news_list > tbody").empty();
       _ref = this.model.get('news');
+      _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         news = _ref[_i];
-        this.add_news_item(news);
+        _results.push(this.add_news_item(news));
       }
-      return $('.status-toggle').switchify();
+      return _results;
     };
 
     NewsView.prototype.afterRender = function() {
