@@ -47,5 +47,6 @@ module.exports = class File extends Parse.Object
 				@id = data.objectId
 				callbacks.success() if callbacks.success
 			error: (data) ->
+				console.log 'err'
 				callbacks.error($.parseJSON(data)).error if callbacks.error
 		})

@@ -5,6 +5,7 @@ module.exports = class PortalView extends View
 	template: template
 	container: '#page-container'
 	autoRender: true
+	id: 'portal'
 
 	initialize: ->
 		super

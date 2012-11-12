@@ -4,6 +4,7 @@ File = require 'models/file'
 News = require 'models/news'
 Section = require 'models/section'
 Source = require 'models/source'
+mediator = require 'mediator'
 
 module.exports = class NewsCreateView extends View
 	template: template
@@ -12,9 +13,6 @@ module.exports = class NewsCreateView extends View
 
 	initialize: ->
 		super
-		Handlebars.registerHelper('isSelectedSection', (section, block) =>
-			if @model.get('news').get('section') and section.id == @model.get('news').get('section').id then block(section) else block.inverse(section)
-		)
 		Handlebars.registerHelper('applicationIconUrl', (block) =>
 			return '#' unless @model.get('news').get('applicationIcon')
 			@model.get('news').get('applicationIcon').get('image').url
@@ -22,6 +20,21 @@ module.exports = class NewsCreateView extends View
 		Handlebars.registerHelper('newsImage', (block) =>
 			return '#' unless @model.get('news').get('image')
 			@model.get('news').get('image').get('image').url
+		)
+		Handlebars.registerHelper('isSelectedSection', (section, block) =>
+			if @model.get('news').get('section') and section.id == @model.get('news').get('section').id then block(section) else block.inverse(section)
+		)
+		Handlebars.registerHelper('isSelectedSource', (source, block) =>
+			if @model.get('news').get('source') and source.id == @model.get('news').get('source').id then block(source) else block.inverse(source)
+		)
+		Handlebars.registerHelper('isSelectedCategory', (category, block) =>
+			if @model.get('news').get('category') == category.value then block(category) else block.inverse(category)
+		)
+		Handlebars.registerHelper('isSelectedPriority', (priority, block) =>
+			if @model.get('news').get('priority') == priority.value then block(priority) else block.inverse(priority)
+		)
+		Handlebars.registerHelper('isSelectedLanguage', (language, block) =>
+			if @model.get('news').get('lang') == language.value then block(language) else block.inverse(language)
 		)
 
 	events: ->
@@ -100,25 +113,28 @@ module.exports = class NewsCreateView extends View
 		@model.get("input-application-icon-data")
 
 	submit: ->
-		@model.get('news').set('description', $('#input-description').html())  
-		@model.get('news').save(null, {
+		newsPtr = @model.get('news')
+		newsPtr.set('description', $('#input-description').html())  
+		newsPtr.save(null, {
 			success: (news) =>
 				if @getNewsImage()
 					newsImageFile = new File()
 					newsImageFile.data = @getNewsImage()
 					newsImageFile.upload({
 						success: =>
-							@model.get('news').set('image', newsImageFile)
-							@model.get('news').save(null)
+							newsPtr.set('image', newsImageFile)
+							newsPtr.save(null)
 					}) 
 				if @getApplicationIcon()
 					applicationIconFile = new File()
 					applicationIconFile.data = @getApplicationIcon()
 					applicationIconFile.upload({
 						success: =>
-							@model.get('news').set('applicationIcon', applicationIconFile)
-							@model.get('news').save(null)
+							newsPtr.set('applicationIcon', applicationIconFile)
+							newsPtr.save(null)
 					}) 
+
+				@publishEvent '!startupController', 'news', 'index'
 
 			error: (news, error) ->
 				alert(error.message)

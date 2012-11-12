@@ -16,7 +16,8 @@ exports.config =
           'vendor/scripts/underscore-1.4.0.js',
           'vendor/scripts/backbone-0.9.2.js',
           'vendor/scripts/parse-1.1.6.min.js',
-          'vendor/scripts/bootstrap.min.js'
+          'vendor/scripts/bootstrap.min.js',
+          'vendor/scripts/jquery.switch.min.js'
         ]
 
     stylesheets:
@@ -28,6 +29,7 @@ exports.config =
         after: [
           'vendor/styles/helpers.css',
           'vendor/styles/bootstrap.min.css'
+          'vendor/styles/jquery.switch.csss'
         ]
 
     templates:

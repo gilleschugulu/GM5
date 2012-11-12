@@ -144,5 +144,5 @@ module.exports = class SessionController extends Controller
     # Nullify property on the mediator
     Parse.User.logOut()
     mediator.user = null
-    mediator.publish '!startupController', 'portal', 'index'
+    @redirectTo 'portal'
 

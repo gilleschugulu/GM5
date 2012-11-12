@@ -222,7 +222,7 @@ window.require.define({"controllers/home_controller": function(exports, require,
 }});
 
 window.require.define({"controllers/news_controller": function(exports, require, module) {
-  var Collection, Controller, Model, News, NewsController, NewsCreateView, NewsView, Section, Source, mediator,
+  var Category, Controller, Language, Model, News, NewsController, NewsCreateView, NewsView, Priority, Section, Source, mediator,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -238,7 +238,11 @@ window.require.define({"controllers/news_controller": function(exports, require,
 
   Source = require('models/source');
 
-  Collection = require('models/base/collection');
+  Category = require('models/category');
+
+  Priority = require('models/priority');
+
+  Language = require('models/language');
 
   Model = require('models/base/model');
 
@@ -261,11 +265,17 @@ window.require.define({"controllers/news_controller": function(exports, require,
     };
 
     NewsController.prototype.index = function() {
+      if (!mediator.user) {
+        return this.redirectTo('portal');
+      }
       return this.view = new NewsView();
     };
 
     NewsController.prototype.show = function(params) {
       var _this = this;
+      if (!mediator.user) {
+        return this.redirectTo('portal');
+      }
       return new Parse.Query(Section).find({
         success: function(sections) {
           return new Parse.Query(Source).find({
@@ -277,7 +287,10 @@ window.require.define({"controllers/news_controller": function(exports, require,
                       title: 'Edit a news',
                       news: news,
                       sections: sections,
-                      sources: sources
+                      sources: sources,
+                      categories: new Category(),
+                      languages: new Language(),
+                      priorities: new Priority()
                     })
                   });
                 },
@@ -293,22 +306,26 @@ window.require.define({"controllers/news_controller": function(exports, require,
 
     NewsController.prototype["new"] = function() {
       var _this = this;
-      this.view = new NewsCreateView({
-        model: new Model({
-          title: 'Create a news',
-          news: new News()
-        })
-      });
-      new Parse.Query(Section).find({
+      if (!mediator.user) {
+        return this.redirectTo('portal');
+      }
+      return new Parse.Query(Section).find({
         success: function(sections) {
-          _this.view.model.attributes.sections = sections;
-          return _this.view.render();
-        }
-      });
-      return new Parse.Query(Source).find({
-        success: function(sources) {
-          _this.view.model.attributes.sources = sources;
-          return _this.view.render();
+          return new Parse.Query(Source).find({
+            success: function(sources) {
+              return _this.view = new NewsCreateView({
+                model: new Model({
+                  title: 'Create a news',
+                  sections: sections,
+                  sources: sources,
+                  news: new News(),
+                  categories: new Category(),
+                  languages: new Language(),
+                  priorities: new Priority()
+                })
+              });
+            }
+          });
         }
       });
     };
@@ -320,13 +337,13 @@ window.require.define({"controllers/news_controller": function(exports, require,
 }});
 
 window.require.define({"controllers/portal_controller": function(exports, require, module) {
-  var Controller, Portal, PortalController, mediator,
+  var Controller, PortalController, PortalView, mediator,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   Controller = require('controllers/base/controller');
 
-  Portal = require('views/portal_view');
+  PortalView = require('views/portal_view');
 
   mediator = require('mediator');
 
@@ -338,10 +355,6 @@ window.require.define({"controllers/portal_controller": function(exports, requir
       return PortalController.__super__.constructor.apply(this, arguments);
     }
 
-    PortalController.prototype.historyURL = function(params) {
-      return "portal";
-    };
-
     PortalController.prototype.initialize = function() {
       return this.subscribeEvent('login', this.login);
     };
@@ -349,9 +362,8 @@ window.require.define({"controllers/portal_controller": function(exports, requir
     PortalController.prototype.index = function() {
       if (mediator.user) {
         return this.loginSuccess(mediator.user);
-      } else {
-        return this.view = new Portal();
       }
+      return this.view = new PortalView();
     };
 
     PortalController.prototype.login = function() {
@@ -370,7 +382,7 @@ window.require.define({"controllers/portal_controller": function(exports, requir
     PortalController.prototype.loginSuccess = function(user) {
       this.publishEvent('loginEnded');
       mediator.user = user;
-      return mediator.publish('!startupController', 'news', 'index');
+      return this.redirectTo('news');
     };
 
     PortalController.prototype.loginFail = function(error) {
@@ -522,7 +534,7 @@ window.require.define({"controllers/session_controller": function(exports, requi
       }
       Parse.User.logOut();
       mediator.user = null;
-      return mediator.publish('!startupController', 'portal', 'index');
+      return this.redirectTo('portal');
     };
 
     return SessionController;
@@ -858,6 +870,51 @@ window.require.define({"models/base/model": function(exports, require, module) {
   
 }});
 
+window.require.define({"models/category": function(exports, require, module) {
+  var Category, Model,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  Model = require('models/base/model');
+
+  module.exports = Category = (function(_super) {
+
+    __extends(Category, _super);
+
+    function Category() {
+      return Category.__super__.constructor.apply(this, arguments);
+    }
+
+    Category.prototype.defaults = {
+      items: [
+        {
+          value: '',
+          name: 'Selectionner'
+        }, {
+          value: '1',
+          name: 'Test'
+        }, {
+          value: '2',
+          name: 'News'
+        }, {
+          value: '3',
+          name: 'Dossier'
+        }, {
+          value: '4',
+          name: 'Business'
+        }, {
+          value: '5',
+          name: 'Rumeur'
+        }
+      ]
+    };
+
+    return Category;
+
+  })(Model);
+  
+}});
+
 window.require.define({"models/file": function(exports, require, module) {
   var File, Model, mediator,
     __hasProp = {}.hasOwnProperty,
@@ -936,6 +993,7 @@ window.require.define({"models/file": function(exports, require, module) {
           }
         },
         error: function(data) {
+          console.log('err');
           if (callbacks.error) {
             return callbacks.error($.parseJSON(data)).error;
           }
@@ -988,6 +1046,42 @@ window.require.define({"models/header": function(exports, require, module) {
   
 }});
 
+window.require.define({"models/language": function(exports, require, module) {
+  var Language, Model,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  Model = require('models/base/model');
+
+  module.exports = Language = (function(_super) {
+
+    __extends(Language, _super);
+
+    function Language() {
+      return Language.__super__.constructor.apply(this, arguments);
+    }
+
+    Language.prototype.defaults = {
+      items: [
+        {
+          value: '',
+          name: 'Selectionner'
+        }, {
+          value: 'fr',
+          name: 'Francais'
+        }, {
+          value: 'en',
+          name: 'Anglais'
+        }
+      ]
+    };
+
+    return Language;
+
+  })(Model);
+  
+}});
+
 window.require.define({"models/news": function(exports, require, module) {
   var Model, News,
     __hasProp = {}.hasOwnProperty,
@@ -1012,6 +1106,45 @@ window.require.define({"models/news": function(exports, require, module) {
     return News;
 
   })(Parse.Object);
+  
+}});
+
+window.require.define({"models/priority": function(exports, require, module) {
+  var Model, Priority,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  Model = require('models/base/model');
+
+  module.exports = Priority = (function(_super) {
+
+    __extends(Priority, _super);
+
+    function Priority() {
+      return Priority.__super__.constructor.apply(this, arguments);
+    }
+
+    Priority.prototype.defaults = {
+      items: [
+        {
+          value: '',
+          name: 'Selectionner'
+        }, {
+          value: '1',
+          name: 'Mineur'
+        }, {
+          value: '2',
+          name: 'Medium'
+        }, {
+          value: '3',
+          name: 'Majeur'
+        }
+      ]
+    };
+
+    return Priority;
+
+  })(Model);
   
 }});
 
@@ -1387,7 +1520,7 @@ window.require.define({"views/login_view": function(exports, require, module) {
 }});
 
 window.require.define({"views/news_create_view": function(exports, require, module) {
-  var File, News, NewsCreateView, Section, Source, View, template,
+  var File, News, NewsCreateView, Section, Source, View, mediator, template,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -1402,6 +1535,8 @@ window.require.define({"views/news_create_view": function(exports, require, modu
   Section = require('models/section');
 
   Source = require('models/source');
+
+  mediator = require('mediator');
 
   module.exports = NewsCreateView = (function(_super) {
 
@@ -1420,6 +1555,18 @@ window.require.define({"views/news_create_view": function(exports, require, modu
     NewsCreateView.prototype.initialize = function() {
       var _this = this;
       NewsCreateView.__super__.initialize.apply(this, arguments);
+      Handlebars.registerHelper('applicationIconUrl', function(block) {
+        if (!_this.model.get('news').get('applicationIcon')) {
+          return '#';
+        }
+        return _this.model.get('news').get('applicationIcon').get('image').url;
+      });
+      Handlebars.registerHelper('newsImage', function(block) {
+        if (!_this.model.get('news').get('image')) {
+          return '#';
+        }
+        return _this.model.get('news').get('image').get('image').url;
+      });
       Handlebars.registerHelper('isSelectedSection', function(section, block) {
         if (_this.model.get('news').get('section') && section.id === _this.model.get('news').get('section').id) {
           return block(section);
@@ -1427,17 +1574,33 @@ window.require.define({"views/news_create_view": function(exports, require, modu
           return block.inverse(section);
         }
       });
-      Handlebars.registerHelper('applicationIconUrl', function(block) {
-        if (!_this.model.get('news').get('applicationIcon')) {
-          return '#';
+      Handlebars.registerHelper('isSelectedSource', function(source, block) {
+        if (_this.model.get('news').get('source') && source.id === _this.model.get('news').get('source').id) {
+          return block(source);
+        } else {
+          return block.inverse(source);
         }
-        return _this.model.get('news').get('applicationIcon').get('image').url;
       });
-      return Handlebars.registerHelper('newsImage', function(block) {
-        if (!_this.model.get('news').get('image')) {
-          return '#';
+      Handlebars.registerHelper('isSelectedCategory', function(category, block) {
+        if (_this.model.get('news').get('category') === category.value) {
+          return block(category);
+        } else {
+          return block.inverse(category);
         }
-        return _this.model.get('news').get('image').get('image').url;
+      });
+      Handlebars.registerHelper('isSelectedPriority', function(priority, block) {
+        if (_this.model.get('news').get('priority') === priority.value) {
+          return block(priority);
+        } else {
+          return block.inverse(priority);
+        }
+      });
+      return Handlebars.registerHelper('isSelectedLanguage', function(language, block) {
+        if (_this.model.get('news').get('lang') === language.value) {
+          return block(language);
+        } else {
+          return block.inverse(language);
+        }
       });
     };
 
@@ -1543,9 +1706,11 @@ window.require.define({"views/news_create_view": function(exports, require, modu
     };
 
     NewsCreateView.prototype.submit = function() {
-      var _this = this;
-      this.model.get('news').set('description', $('#input-description').html());
-      return this.model.get('news').save(null, {
+      var newsPtr,
+        _this = this;
+      newsPtr = this.model.get('news');
+      newsPtr.set('description', $('#input-description').html());
+      return newsPtr.save(null, {
         success: function(news) {
           var applicationIconFile, newsImageFile;
           if (_this.getNewsImage()) {
@@ -1553,21 +1718,22 @@ window.require.define({"views/news_create_view": function(exports, require, modu
             newsImageFile.data = _this.getNewsImage();
             newsImageFile.upload({
               success: function() {
-                _this.model.get('news').set('image', newsImageFile);
-                return _this.model.get('news').save(null);
+                newsPtr.set('image', newsImageFile);
+                return newsPtr.save(null);
               }
             });
           }
           if (_this.getApplicationIcon()) {
             applicationIconFile = new File();
             applicationIconFile.data = _this.getApplicationIcon();
-            return applicationIconFile.upload({
+            applicationIconFile.upload({
               success: function() {
-                _this.model.get('news').set('applicationIcon', applicationIconFile);
-                return _this.model.get('news').save(null);
+                newsPtr.set('applicationIcon', applicationIconFile);
+                return newsPtr.save(null);
               }
             });
           }
+          return _this.publishEvent('!startupController', 'news', 'index');
         },
         error: function(news, error) {
           return alert(error.message);
@@ -1625,13 +1791,79 @@ window.require.define({"views/news_list_item_view": function(exports, require, m
 
     NewsListItemView.prototype.events = function() {
       return {
-        "click": "click"
+        "click .news-actions-destroy": "clickDestroy",
+        "click .news-actions-edit": "clickEdit",
+        "click .news-actions-status-toggle": "toggleStatus"
       };
     };
 
-    NewsListItemView.prototype.click = function(event) {
+    NewsListItemView.prototype.clickEdit = function(event) {
       return mediator.publish('!startupController', 'news', 'show', {
         id: this.model.id
+      });
+    };
+
+    NewsListItemView.prototype.clickDestroy = function(event) {
+      if (confirm('Vraiment?! :O')) {
+        $(this.el).remove();
+        return this.model.destroy();
+      }
+    };
+
+    NewsListItemView.prototype.toggleStatus = function(event) {
+      this.model.set('active', !this.model.get('active'));
+      this.model.save(null);
+      if (this.model.get('active')) {
+        $(event.target).removeClass('btn-danger');
+        $(event.target).addClass('btn-success');
+        return $(event.target).val('Active');
+      } else {
+        $(event.target).removeClass('btn-success');
+        $(event.target).addClass('btn-danger');
+        return $(event.target).val('Inactive');
+      }
+    };
+
+    NewsListItemView.prototype.render = function() {
+      NewsListItemView.__super__.render.apply(this, arguments);
+      switch (false) {
+        case this.model.get('priority') !== 1:
+          return $(this.el).find('.priority-label').addClass('label-info');
+        case this.model.get('priority') !== 2:
+          return $(this.el).find('.priority-label').addClass('label-warning');
+        case this.model.get('priority') !== 3:
+          return $(this.el).find('.priority-label').addClass('label-important');
+      }
+    };
+
+    NewsListItemView.prototype.initialize = function() {
+      var _this = this;
+      NewsListItemView.__super__.initialize.apply(this, arguments);
+      Handlebars.registerHelper('newsImage', function(block) {
+        if (!_this.model.get('image')) {
+          return '#';
+        }
+        return _this.model.get('image').get('image').url;
+      });
+      Handlebars.registerHelper('formatedCreationDate', function(block) {
+        return _this.model.createdAt.substring(0, 10);
+      });
+      Handlebars.registerHelper('formatedPriority', function(block) {
+        switch (false) {
+          case _this.model.get('priority') !== 1:
+            return 'Low';
+          case _this.model.get('priority') !== 2:
+            return 'Medium';
+          case _this.model.get('priority') !== 3:
+            return 'High';
+        }
+      });
+      return Handlebars.registerHelper('isActive', function(block) {
+        if (_this.model.get('active')) {
+          return block(_this);
+        } else {
+          return block.inverse(_this);
+        }
       });
     };
 
@@ -1673,8 +1905,7 @@ window.require.define({"views/news_view": function(exports, require, module) {
     NewsView.prototype.autoRender = true;
 
     NewsView.prototype.initialize = function() {
-      NewsView.__super__.initialize.apply(this, arguments);
-      return this.refresh();
+      return NewsView.__super__.initialize.apply(this, arguments);
     };
 
     NewsView.prototype.add_news_item = function(news) {
@@ -1686,23 +1917,28 @@ window.require.define({"views/news_view": function(exports, require, module) {
     };
 
     NewsView.prototype.reload_data = function() {
-      var news, _i, _len, _ref, _results;
-      $("#news_list").html('');
-      _ref = this.model.news;
-      _results = [];
+      var news, _i, _len, _ref;
+      $("#news_list > tbody").empty();
+      _ref = this.model.get('news');
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         news = _ref[_i];
-        _results.push(this.add_news_item(news));
+        this.add_news_item(news);
       }
-      return _results;
+      return $('.status-toggle').switchify();
+    };
+
+    NewsView.prototype.afterRender = function() {
+      NewsView.__super__.afterRender.apply(this, arguments);
+      return this.refresh();
     };
 
     NewsView.prototype.refresh = function() {
       var _this = this;
-      return new Parse.Query(News).find({
+      return new Parse.Query(News).include(['image', 'section', 'source']).find({
         success: function(news) {
-          _this.model = new Model();
-          _this.model.news = news;
+          _this.model = new Model({
+            news: news
+          });
           return _this.reload_data();
         }
       });
@@ -1736,6 +1972,8 @@ window.require.define({"views/portal_view": function(exports, require, module) {
     PortalView.prototype.container = '#page-container';
 
     PortalView.prototype.autoRender = true;
+
+    PortalView.prototype.id = 'portal';
 
     PortalView.prototype.initialize = function() {
       PortalView.__super__.initialize.apply(this, arguments);
@@ -1781,7 +2019,7 @@ window.require.define({"views/templates/header": function(exports, require, modu
     
     return "\n             <li class=\"active\">\n               <a class=\"dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\">News <span class=\"caret\"></span></a>\n               <ul class=\"dropdown-menu\">\n                 <li><a href=\"/news\">All news</a></li>\n                 <li><a href=\"javascript: window.location.href='/news/new'\">Create a news</a></li>\n               </ul>\n             </li>\n             <li><a href=\"#\" id=\"logout\">Logout</a></li>\n          ";}
 
-    buffer += "<div class=\"navbar navbar-inverse navbar-fixed-top\">\n  <div class=\"navbar-inner\">\n    <div class=\"container\">\n      <a class=\"btn btn-navbar\" data-toggle=\"collapse\" data-target=\".nav-collapse\">\n        <span class=\"icon-bar\"></span>\n        <span class=\"icon-bar\"></span>\n        <span class=\"icon-bar\"></span>\n      </a>\n      <a class=\"brand\" href=\"#\">Mobile Gaming News</a>\n      <div class=\"nav-collapse collapse\">\n        <ul class=\"nav\">\n          ";
+    buffer += "<div class=\"navbar navbar-inverse navbar-fixed-top\">\n  <div class=\"navbar-inner\">\n    <div class=\"container\">\n      <a class=\"btn btn-navbar\" data-toggle=\"collapse\" data-target=\".nav-collapse\">\n        <span class=\"icon-bar\"></span>\n        <span class=\"icon-bar\"></span>\n        <span class=\"icon-bar\"></span>\n      </a>\n      <a class=\"brand\" href=\"/news\">Mobile Gaming News</a>\n      <div class=\"nav-collapse collapse\">\n        <ul class=\"nav\">\n          ";
     foundHelper = helpers.isLoggedIn;
     stack1 = foundHelper || depth0.isLoggedIn;
     tmp1 = self.program(1, program1, data);
@@ -1819,7 +2057,7 @@ window.require.define({"views/templates/news": function(exports, require, module
     var foundHelper, self=this;
 
 
-    return "<legend>News list</legend>\n<table id=\"news_list\" class=\"table table-hover\">\n</table>\n";});
+    return "<legend>News List</legend>\n<table id=\"news_list\" class=\"table table-hover\">\n	<thead>\n		<tr>\n			<th>Image</th>\n			<th>Date</th>\n			<th>Priority</th>\n			<th>Titre</th>\n			<th>Source</th>\n			<th>Category</th>\n			<th>Language</th>\n			<th>Status</th>\n			<th></th>\n		</tr>\n	</thead>\n</table>\n<legend>Actions</legend>\n<a class=\"btn btn-large btn-block btn-primary\" href=\"/news/new\">Create a News</a>\n\n";});
 }});
 
 window.require.define({"views/templates/news_details": function(exports, require, module) {
@@ -1879,8 +2117,185 @@ window.require.define({"views/templates/news_details": function(exports, require
 
   function program6(depth0,data) {
     
+    var buffer = "", stack1, stack2;
+    buffer += "\n          ";
+    stack1 = depth0;
+    foundHelper = helpers.isSelectedCategory;
+    stack2 = foundHelper || depth0.isSelectedCategory;
+    tmp1 = self.program(7, program7, data);
+    tmp1.hash = {};
+    tmp1.fn = tmp1;
+    tmp1.inverse = self.program(9, program9, data);
+    if(foundHelper && typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, tmp1); }
+    else { stack1 = blockHelperMissing.call(depth0, stack2, stack1, tmp1); }
+    if(stack1 || stack1 === 0) { buffer += stack1; }
+    buffer += "\n        ";
+    return buffer;}
+  function program7(depth0,data) {
+    
     var buffer = "", stack1;
-    buffer += "\n  				<option value=\"";
+    buffer += "\n            <option value=\"";
+    foundHelper = helpers.value;
+    stack1 = foundHelper || depth0.value;
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "value", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "\" selected>";
+    foundHelper = helpers.name;
+    stack1 = foundHelper || depth0.name;
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "name", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "</option>      \n          ";
+    return buffer;}
+
+  function program9(depth0,data) {
+    
+    var buffer = "", stack1;
+    buffer += "\n            <option value=\"";
+    foundHelper = helpers.value;
+    stack1 = foundHelper || depth0.value;
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "value", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "\">";
+    foundHelper = helpers.name;
+    stack1 = foundHelper || depth0.name;
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "name", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "</option>      \n          ";
+    return buffer;}
+
+  function program11(depth0,data) {
+    
+    var buffer = "", stack1, stack2;
+    buffer += "\n          ";
+    stack1 = depth0;
+    foundHelper = helpers.isSelectedPriority;
+    stack2 = foundHelper || depth0.isSelectedPriority;
+    tmp1 = self.program(12, program12, data);
+    tmp1.hash = {};
+    tmp1.fn = tmp1;
+    tmp1.inverse = self.program(14, program14, data);
+    if(foundHelper && typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, tmp1); }
+    else { stack1 = blockHelperMissing.call(depth0, stack2, stack1, tmp1); }
+    if(stack1 || stack1 === 0) { buffer += stack1; }
+    buffer += "\n        ";
+    return buffer;}
+  function program12(depth0,data) {
+    
+    var buffer = "", stack1;
+    buffer += "\n            <option value=\"";
+    foundHelper = helpers.value;
+    stack1 = foundHelper || depth0.value;
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "value", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "\" selected>";
+    foundHelper = helpers.name;
+    stack1 = foundHelper || depth0.name;
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "name", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "</option>      \n          ";
+    return buffer;}
+
+  function program14(depth0,data) {
+    
+    var buffer = "", stack1;
+    buffer += "\n            <option value=\"";
+    foundHelper = helpers.value;
+    stack1 = foundHelper || depth0.value;
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "value", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "\">";
+    foundHelper = helpers.name;
+    stack1 = foundHelper || depth0.name;
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "name", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "</option>      \n          ";
+    return buffer;}
+
+  function program16(depth0,data) {
+    
+    var buffer = "", stack1, stack2;
+    buffer += "\n          ";
+    stack1 = depth0;
+    foundHelper = helpers.isSelectedLanguage;
+    stack2 = foundHelper || depth0.isSelectedLanguage;
+    tmp1 = self.program(17, program17, data);
+    tmp1.hash = {};
+    tmp1.fn = tmp1;
+    tmp1.inverse = self.program(19, program19, data);
+    if(foundHelper && typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, tmp1); }
+    else { stack1 = blockHelperMissing.call(depth0, stack2, stack1, tmp1); }
+    if(stack1 || stack1 === 0) { buffer += stack1; }
+    buffer += "\n        ";
+    return buffer;}
+  function program17(depth0,data) {
+    
+    var buffer = "", stack1;
+    buffer += "\n            <option value=\"";
+    foundHelper = helpers.value;
+    stack1 = foundHelper || depth0.value;
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "value", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "\" selected>";
+    foundHelper = helpers.name;
+    stack1 = foundHelper || depth0.name;
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "name", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "</option>      \n          ";
+    return buffer;}
+
+  function program19(depth0,data) {
+    
+    var buffer = "", stack1;
+    buffer += "\n            <option value=\"";
+    foundHelper = helpers.value;
+    stack1 = foundHelper || depth0.value;
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "value", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "\">";
+    foundHelper = helpers.name;
+    stack1 = foundHelper || depth0.name;
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "name", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "</option>      \n          ";
+    return buffer;}
+
+  function program21(depth0,data) {
+    
+    var buffer = "", stack1, stack2;
+    buffer += "\n          ";
+    stack1 = depth0;
+    foundHelper = helpers.isSelectedSource;
+    stack2 = foundHelper || depth0.isSelectedSource;
+    tmp1 = self.program(22, program22, data);
+    tmp1.hash = {};
+    tmp1.fn = tmp1;
+    tmp1.inverse = self.program(24, program24, data);
+    if(foundHelper && typeof stack2 === functionType) { stack1 = stack2.call(depth0, stack1, tmp1); }
+    else { stack1 = blockHelperMissing.call(depth0, stack2, stack1, tmp1); }
+    if(stack1 || stack1 === 0) { buffer += stack1; }
+    buffer += "\n  			";
+    return buffer;}
+  function program22(depth0,data) {
+    
+    var buffer = "", stack1;
+    buffer += "\n            <option value=\"";
+    foundHelper = helpers.id;
+    stack1 = foundHelper || depth0.id;
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "id", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "\" selected>";
+    foundHelper = helpers.attributes;
+    stack1 = foundHelper || depth0.attributes;
+    stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.name);
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "attributes.name", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "</option>      \n          ";
+    return buffer;}
+
+  function program24(depth0,data) {
+    
+    var buffer = "", stack1;
+    buffer += "\n            <option value=\"";
     foundHelper = helpers.id;
     stack1 = foundHelper || depth0.id;
     if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
@@ -1891,20 +2306,20 @@ window.require.define({"views/templates/news_details": function(exports, require
     stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.name);
     if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
     else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "attributes.name", { hash: {} }); }
-    buffer += escapeExpression(stack1) + "</option>\n  			";
+    buffer += escapeExpression(stack1) + "</option>      \n          ";
     return buffer;}
 
-  function program8(depth0,data) {
+  function program26(depth0,data) {
     
     
     return "\n        <button type=\"button\" class=\"btn btn-large btn-block btn-primary\" id=\"submit-button\">Edit News!</button>\n      ";}
 
-  function program10(depth0,data) {
+  function program28(depth0,data) {
     
     
     return "\n        <button type=\"button\" class=\"btn btn-large btn-block btn-primary\" id=\"submit-button\">Create News!</button>\n      ";}
 
-    buffer += "<script src=\"/tiny_mce/jquery.tinymce.js\"></script>\n<form  class=\"form-horizontal\">\n  <legend>";
+    buffer += "\n<!-- Shall we move this somewhere more appropriate? -->\n<script src=\"/tiny_mce/jquery.tinymce.js\"></script>\n\n<form class=\"form-horizontal\">\n  <legend>";
     foundHelper = helpers.title;
     stack1 = foundHelper || depth0.title;
     if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
@@ -1933,11 +2348,44 @@ window.require.define({"views/templates/news_details": function(exports, require
     stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.tags);
     if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
     else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "news.attributes.tags", { hash: {} }); }
-    buffer += escapeExpression(stack1) + "\">\n  <br />\n  <br />\n  <div class=\"row\">\n  	<div class=\"span2\">\n  		<label>Categorie</label>\n  		<select class=\"span2\" id=\"input-category\">\n        <option value=\"\">Selectioner</option>\n  			<option value=\"1\">Test</option>\n  			<option value=\"2\">News</option>\n  			<option value=\"3\">Dossier</option>\n  			<option value=\"4\">Business</option>\n  			<option value=\"5\">Rumeur</option>\n  		</select>\n  	</div>\n  	<div class=\"span2\">\n  		<label>Importance</label>\n  		<select class=\"span2\" id=\"input-priority\">\n        <option value=\"\">Selectioner</option>\n  			<option value=\"1\">Mineur</option>\n  			<option value=\"2\">Medium</option>\n  			<option value=\"3\">Majeur</option>\n  		</select>\n  	</div>\n  	<div class=\"span2\">\n  		<label>Langue</label>\n  		<select class=\"span2\" id=\"input-lang\">\n        <option value=\"\">Selectioner</option>\n  			<option value=\"fr\">Francais</option>\n  			<option value=\"en\">Anglais</option>\n  		</select>\n  	</div>\n  	<div class=\"span2\">\n  		<label>Source</label>\n  		<select class=\"span2\" id=\"input-source\">\n        <option value=\"\">Selectioner</option>\n  			";
+    buffer += escapeExpression(stack1) + "\">\n  <br />\n  <br />\n  <div class=\"row\">\n  	<div class=\"span2\">\n  		<label>Categorie</label>\n  		<select class=\"span2\" id=\"input-category\">\n        ";
+    foundHelper = helpers.categories;
+    stack1 = foundHelper || depth0.categories;
+    stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.items);
+    stack2 = helpers.each;
+    tmp1 = self.program(6, program6, data);
+    tmp1.hash = {};
+    tmp1.fn = tmp1;
+    tmp1.inverse = self.noop;
+    stack1 = stack2.call(depth0, stack1, tmp1);
+    if(stack1 || stack1 === 0) { buffer += stack1; }
+    buffer += "\n  		</select>\n  	</div>\n  	<div class=\"span2\">\n  		<label>Importance</label>\n  		<select class=\"span2\" id=\"input-priority\">\n        ";
+    foundHelper = helpers.priorities;
+    stack1 = foundHelper || depth0.priorities;
+    stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.items);
+    stack2 = helpers.each;
+    tmp1 = self.program(11, program11, data);
+    tmp1.hash = {};
+    tmp1.fn = tmp1;
+    tmp1.inverse = self.noop;
+    stack1 = stack2.call(depth0, stack1, tmp1);
+    if(stack1 || stack1 === 0) { buffer += stack1; }
+    buffer += "\n  		</select>\n  	</div>\n  	<div class=\"span2\">\n  		<label>Langue</label>\n  		<select class=\"span2\" id=\"input-lang\">\n        ";
+    foundHelper = helpers.languages;
+    stack1 = foundHelper || depth0.languages;
+    stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.items);
+    stack2 = helpers.each;
+    tmp1 = self.program(16, program16, data);
+    tmp1.hash = {};
+    tmp1.fn = tmp1;
+    tmp1.inverse = self.noop;
+    stack1 = stack2.call(depth0, stack1, tmp1);
+    if(stack1 || stack1 === 0) { buffer += stack1; }
+    buffer += "\n  		</select>\n  	</div>\n  	<div class=\"span2\">\n  		<label>Source</label>\n  		<select class=\"span2\" id=\"input-source\">\n        <option value=\"\">Selectioner</option>\n  			";
     foundHelper = helpers.sources;
     stack1 = foundHelper || depth0.sources;
     stack2 = helpers.each;
-    tmp1 = self.program(6, program6, data);
+    tmp1 = self.program(21, program21, data);
     tmp1.hash = {};
     tmp1.fn = tmp1;
     tmp1.inverse = self.noop;
@@ -2014,10 +2462,10 @@ window.require.define({"views/templates/news_details": function(exports, require
     stack1 = foundHelper || depth0.news;
     stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.id);
     stack2 = helpers['if'];
-    tmp1 = self.program(8, program8, data);
+    tmp1 = self.program(26, program26, data);
     tmp1.hash = {};
     tmp1.fn = tmp1;
-    tmp1.inverse = self.program(10, program10, data);
+    tmp1.inverse = self.program(28, program28, data);
     stack1 = stack2.call(depth0, stack1, tmp1);
     if(stack1 || stack1 === 0) { buffer += stack1; }
     buffer += "\n  	</div>\n  </div>\n</form>";
@@ -2027,20 +2475,77 @@ window.require.define({"views/templates/news_details": function(exports, require
 window.require.define({"views/templates/news_list_item": function(exports, require, module) {
   module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
     helpers = helpers || Handlebars.helpers;
-    var buffer = "", stack1, foundHelper, self=this, functionType="function", helperMissing=helpers.helperMissing, undef=void 0, escapeExpression=this.escapeExpression;
+    var buffer = "", stack1, foundHelper, tmp1, self=this, functionType="function", helperMissing=helpers.helperMissing, undef=void 0, escapeExpression=this.escapeExpression, blockHelperMissing=helpers.blockHelperMissing;
 
+  function program1(depth0,data) {
+    
+    
+    return "\n		<input type=\"button\" class=\"btn btn-small btn-success news-actions-status-toggle\" value=\"Active\"/>\n	";}
 
-    buffer += "<td class=\"news_list_item\" data-id=\"";
+  function program3(depth0,data) {
+    
+    
+    return "\n		<input type=\"button\" class=\"btn btn-small btn-danger news-actions-status-toggle\" value=\"Inactive\"/>\n	";}
+
+    buffer += "<td style=\"width: 110px\"><img src=\"";
+    foundHelper = helpers.newsImage;
+    stack1 = foundHelper || depth0.newsImage;
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "newsImage", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "\" width=\"110\" height=\"110\"/></td>\n<td style=\"white-space:nowrap\">";
+    foundHelper = helpers.formatedCreationDate;
+    stack1 = foundHelper || depth0.formatedCreationDate;
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "formatedCreationDate", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "</td>\n<td style=\"white-space:nowrap\"><span class=\"label priority-label\">";
+    foundHelper = helpers.formatedPriority;
+    stack1 = foundHelper || depth0.formatedPriority;
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "formatedPriority", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "</span></td>\n<td style=\"white-space:nowrap\">";
+    foundHelper = helpers.attributes;
+    stack1 = foundHelper || depth0.attributes;
+    stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.title);
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "attributes.title", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "</td>\n<td style=\"white-space:nowrap\">";
+    foundHelper = helpers.attributes;
+    stack1 = foundHelper || depth0.attributes;
+    stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.source);
+    stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.attributes);
+    stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.name);
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "attributes.source.attributes.name", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "</td>\n<td style=\"white-space:nowrap\">";
+    foundHelper = helpers.attributes;
+    stack1 = foundHelper || depth0.attributes;
+    stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.section);
+    stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.attributes);
+    stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.name);
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "attributes.section.attributes.name", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "</td>\n<td style=\"white-space:nowrap\">";
+    foundHelper = helpers.attributes;
+    stack1 = foundHelper || depth0.attributes;
+    stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.lang);
+    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
+    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "attributes.lang", { hash: {} }); }
+    buffer += escapeExpression(stack1) + "</td>\n<td style=\"width: 200px\">\n	";
+    foundHelper = helpers.isActive;
+    stack1 = foundHelper || depth0.isActive;
+    tmp1 = self.program(1, program1, data);
+    tmp1.hash = {};
+    tmp1.fn = tmp1;
+    tmp1.inverse = self.program(3, program3, data);
+    if(foundHelper && typeof stack1 === functionType) { stack1 = stack1.call(depth0, tmp1); }
+    else { stack1 = blockHelperMissing.call(depth0, stack1, tmp1); }
+    if(stack1 || stack1 === 0) { buffer += stack1; }
+    buffer += "\n</td>\n<td style=\"width: 90px\">\n	<div id=\"news-";
     foundHelper = helpers.id;
     stack1 = foundHelper || depth0.id;
     if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
     else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "id", { hash: {} }); }
-    buffer += escapeExpression(stack1) + "\">";
-    foundHelper = helpers.id;
-    stack1 = foundHelper || depth0.id;
-    if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
-    else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "id", { hash: {} }); }
-    buffer += escapeExpression(stack1) + "</td>";
+    buffer += escapeExpression(stack1) + "-actions\" style=\"width: 100%;height: 100%\"> \n		<input type=\"button\" class=\"news-actions-edit btn btn-small btn-block btn-primary\" value=\"Edit\"/>\n		<input type=\"button\" class=\"news-actions-destroy btn btn-small btn-block btn-danger\" value=\"Effacer\" confirm=\"alert('sure?')\"/>\n	</div>\n</td>";
     return buffer;});
 }});
 
@@ -2050,6 +2555,6 @@ window.require.define({"views/templates/portal": function(exports, require, modu
     var foundHelper, self=this;
 
 
-    return "<form class=\"form-horizontal\" onsubmit=\"javascript: $('#sign-in-button').click()\">\n	<legend>Login</legend>\n  <div class=\"control-group\">\n    <label class=\"control-label\" for=\"inputEmail\">Email</label>\n    <div class=\"controls\">\n      <input type=\"text\" id=\"inputEmail\" placeholder=\"Email\">\n    </div>\n  </div>\n  <div class=\"control-group\">\n    <label class=\"control-label\" for=\"inputPassword\">Password</label>\n    <div class=\"controls\">\n      <input type=\"password\" id=\"inputPassword\" placeholder=\"Password\">\n    </div>\n  </div>\n  <div class=\"control-group\">\n    <div class=\"controls\">\n      <label class=\"checkbox\">\n        <input type=\"checkbox\"> Remember me\n      </label>\n      <button type=\"submit\" class=\"btn\" id=\"sign-in-button\">Sign in</button>\n    </div>\n  </div>\n</form>";});
+    return "<form class=\"form-horizontal\" onsubmit=\"javascript: $('#sign-in-button').click()\">\n	<legend>Login</legend>\n  <div class=\"control-group\">\n    <label class=\"control-label\" for=\"inputEmail\">Email</label>\n    <div class=\"controls\">\n      <input type=\"text\" id=\"inputEmail\" placeholder=\"Email\">\n    </div>\n  </div>\n  <div class=\"control-group\">\n    <label class=\"control-label\" for=\"inputPassword\">Password</label>\n    <div class=\"controls\">\n      <input type=\"password\" id=\"inputPassword\" placeholder=\"Password\">\n    </div>\n  </div>\n  <div class=\"control-group\">\n    <div class=\"controls\">\n      <label class=\"checkbox\">\n        <input type=\"checkbox\"> Remember me\n      </label>\n      <button type=\"submit\" class=\"btn\" id=\"sign-in-button\">Sign in</button>\n    </div>\n  </div>\n</form>\n";});
 }});
 

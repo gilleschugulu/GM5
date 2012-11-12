@@ -4,7 +4,9 @@ News = require 'models/news'
 NewsView = require 'views/news_view'
 NewsCreateView = require 'views/news_create_view'
 Source = require 'models/source'
-Collection = require 'models/base/collection'
+Category = require 'models/category'
+Priority = require 'models/priority'
+Language = require 'models/language'
 Model = require 'models/base/model'
 mediator = require 'mediator'
 
@@ -14,9 +16,11 @@ module.exports = class NewsController extends Controller
 		if params.id then "news/#{params.id}" else 'news'
 
 	index: ->
+		return @redirectTo 'portal' unless mediator.user
 		@view = new NewsView()
 
 	show: (params) ->
+		return @redirectTo 'portal' unless mediator.user
 		new Parse.Query(Section).find({
 			success: (sections) =>
 				new Parse.Query(Source).find({
@@ -29,6 +33,9 @@ module.exports = class NewsController extends Controller
 										news: news
 										sections: sections
 										sources: sources
+										categories: new Category()
+										languages: new Language()
+										priorities: new Priority()
 									})
 								)
 							error: (news, error) =>
@@ -38,19 +45,22 @@ module.exports = class NewsController extends Controller
 		})
 
 	new: ->
-		@view = new NewsCreateView(
-			model: new Model({
-				title: 'Create a news'
-				news: new News()
-			})
-		)
+		return @redirectTo 'portal' unless mediator.user
 		new Parse.Query(Section).find({
 			success: (sections) =>
-				@view.model.attributes.sections = sections
-				@view.render()
+				new Parse.Query(Source).find({
+					success: (sources) =>
+						@view = new NewsCreateView(
+							model: new Model({
+								title: 'Create a news'
+								sections: sections
+								sources: sources
+								news: new News()
+								categories: new Category()
+								languages: new Language()
+								priorities: new Priority()
+							})
+						)
+				})
 		})
-		new Parse.Query(Source).find({
-			success: (sources) =>
-				@view.model.attributes.sources = sources
-				@view.render()
-		})
+

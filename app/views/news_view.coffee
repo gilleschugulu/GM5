@@ -6,26 +6,29 @@ Collection = require 'models/base/collection'
 NewsListItemView = require 'views/news_list_item_view'
 
 module.exports = class NewsView extends View
-  template: template
-  container: '#page-container'
-  autoRender: true
+	template: template
+	container: '#page-container'
+	autoRender: true
 
-  initialize: -> 
-  	super
-  	@refresh()
+	initialize: -> 
+		super
 
-  add_news_item: (news) -> 
-  	row = new NewsListItemView(model: news)
-  	$("#news_list").append(row.render().el);
+	add_news_item: (news) -> 
+		row = new NewsListItemView(model: news)
+		$("#news_list").append(row.render().el);
 
-  reload_data: ->
-  	$("#news_list").html('')
-  	@add_news_item(news) for news in @model.news
+	reload_data: ->
+		$("#news_list > tbody").empty()
+		@add_news_item(news) for news in @model.get('news')
+		$('.status-toggle').switchify();
 
-  refresh: ->
-  	new Parse.Query(News).find({
-  		success: (news) =>
-  			@model = new Model()
-  			@model.news = news
-  			@reload_data()
-  	})
+	afterRender: ->
+		super
+		@refresh()
+
+	refresh: ->
+		new Parse.Query(News).include(['image', 'section', 'source']).find({
+			success: (news) =>
+				@model = new Model(news: news)
+				@reload_data()
+		})

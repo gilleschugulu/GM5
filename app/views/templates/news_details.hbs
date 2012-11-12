@@ -1,5 +1,8 @@
+
+<!-- Shall we move this somewhere more appropriate? -->
 <script src="/tiny_mce/jquery.tinymce.js"></script>
-<form  class="form-horizontal">
+
+<form class="form-horizontal">
   <legend>{{title}}</legend>
   <label>Rubrique</label>
   {{#each sections}}
@@ -25,29 +28,37 @@
   	<div class="span2">
   		<label>Categorie</label>
   		<select class="span2" id="input-category">
-        <option value="">Selectioner</option>
-  			<option value="1">Test</option>
-  			<option value="2">News</option>
-  			<option value="3">Dossier</option>
-  			<option value="4">Business</option>
-  			<option value="5">Rumeur</option>
+        {{#each categories.items}}
+          {{#isSelectedCategory this}}
+            <option value="{{value}}" selected>{{name}}</option>      
+          {{else}}
+            <option value="{{value}}">{{name}}</option>      
+          {{/isSelectedCategory}}
+        {{/each}}
   		</select>
   	</div>
   	<div class="span2">
   		<label>Importance</label>
   		<select class="span2" id="input-priority">
-        <option value="">Selectioner</option>
-  			<option value="1">Mineur</option>
-  			<option value="2">Medium</option>
-  			<option value="3">Majeur</option>
+        {{#each priorities.items}}
+          {{#isSelectedPriority this}}
+            <option value="{{value}}" selected>{{name}}</option>      
+          {{else}}
+            <option value="{{value}}">{{name}}</option>      
+          {{/isSelectedPriority}}
+        {{/each}}
   		</select>
   	</div>
   	<div class="span2">
   		<label>Langue</label>
   		<select class="span2" id="input-lang">
-        <option value="">Selectioner</option>
-  			<option value="fr">Francais</option>
-  			<option value="en">Anglais</option>
+        {{#each languages.items}}
+          {{#isSelectedLanguage this}}
+            <option value="{{value}}" selected>{{name}}</option>      
+          {{else}}
+            <option value="{{value}}">{{name}}</option>      
+          {{/isSelectedLanguage}}
+        {{/each}}
   		</select>
   	</div>
   	<div class="span2">
@@ -55,7 +66,11 @@
   		<select class="span2" id="input-source">
         <option value="">Selectioner</option>
   			{{#each sources}}
-  				<option value="{{id}}">{{attributes.name}}</option>
+          {{#isSelectedSource this}}
+            <option value="{{id}}" selected>{{attributes.name}}</option>      
+          {{else}}
+            <option value="{{id}}">{{attributes.name}}</option>      
+          {{/isSelectedSource}}
   			{{/each}}
   		</select>
   	</div>

@@ -74,27 +74,14 @@
   globals.require.brunch = true;
 })();
 
-window.require.define({"test/controllers/news_controller_test": function(exports, require, module) {
-  var News;
+window.require.define({"test/models/category_test": function(exports, require, module) {
+  var Category;
 
-  News = require('controllers/news');
+  Category = require('models/category');
 
-  describe('News', function() {
+  describe('Category', function() {
     return beforeEach(function() {
-      return this.controller = new News();
-    });
-  });
-  
-}});
-
-window.require.define({"test/controllers/portal_controller_test": function(exports, require, module) {
-  var Portal;
-
-  Portal = require('controllers/portal');
-
-  describe('Portal', function() {
-    return beforeEach(function() {
-      return this.controller = new Portal();
+      return this.model = new Category();
     });
   });
   
@@ -132,6 +119,19 @@ window.require.define({"test/models/header_test": function(exports, require, mod
   
 }});
 
+window.require.define({"test/models/language_test": function(exports, require, module) {
+  var Language;
+
+  Language = require('models/language');
+
+  describe('Language', function() {
+    return beforeEach(function() {
+      return this.model = new Language();
+    });
+  });
+  
+}});
+
 window.require.define({"test/models/news_test": function(exports, require, module) {
   var News;
 
@@ -140,6 +140,19 @@ window.require.define({"test/models/news_test": function(exports, require, modul
   describe('News', function() {
     return beforeEach(function() {
       return this.model = new News();
+    });
+  });
+  
+}});
+
+window.require.define({"test/models/priority_test": function(exports, require, module) {
+  var Priority;
+
+  Priority = require('models/priority');
+
+  describe('Priority', function() {
+    return beforeEach(function() {
+      return this.model = new Priority();
     });
   });
   
@@ -168,22 +181,6 @@ window.require.define({"test/models/source_test": function(exports, require, mod
       return this.model = new Source();
     });
   });
-  
-}});
-
-window.require.define({"test/test-helpers": function(exports, require, module) {
-  var chai, sinonChai;
-
-  chai = require('chai');
-
-  sinonChai = require('sinon-chai');
-
-  chai.use(sinonChai);
-
-  module.exports = {
-    expect: chai.expect,
-    sinon: require('sinon')
-  };
   
 }});
 
@@ -311,11 +308,12 @@ window.require.define({"test/views/portal_view_test": function(exports, require,
   
 }});
 
-window.require('test/controllers/news_controller_test');
-window.require('test/controllers/portal_controller_test');
+window.require('test/models/category_test');
 window.require('test/models/file_test');
 window.require('test/models/header_test');
+window.require('test/models/language_test');
 window.require('test/models/news_test');
+window.require('test/models/priority_test');
 window.require('test/models/section_test');
 window.require('test/models/source_test');
 window.require('test/views/header_view_test');

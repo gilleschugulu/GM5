@@ -1,17 +1,15 @@
 Controller = require 'controllers/base/controller'
-Portal = require 'views/portal_view'
+PortalView = require 'views/portal_view'
 mediator = require 'mediator'
 
 module.exports = class PortalController extends Controller
-
-	historyURL: (params) ->
-		"portal"
 
 	initialize: ->
 		@subscribeEvent 'login', @login
 
 	index: ->
-		if mediator.user then @loginSuccess(mediator.user) else @view = new Portal()
+		return @loginSuccess(mediator.user) if mediator.user
+		@view = new PortalView()
 
 	login: ->
 		@publishEvent('loginStarted')
@@ -25,7 +23,7 @@ module.exports = class PortalController extends Controller
 	loginSuccess: (user) ->
 		@publishEvent('loginEnded')
 		mediator.user = user
-		mediator.publish '!startupController', 'news', 'index'
+		@redirectTo('news')
 
 	loginFail: (error) ->
 		@publishEvent('loginEnded')
