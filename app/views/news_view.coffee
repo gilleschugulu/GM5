@@ -20,7 +20,6 @@ module.exports = class NewsView extends View
 	reload_data: ->
 		$("#news_list > tbody").empty()
 		@add_news_item(news) for news in @model.get('news')
-		$('.status-toggle').switchify();
 
 	afterRender: ->
 		super
