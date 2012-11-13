@@ -79,7 +79,8 @@ module.exports = class NewsCreateView extends View
 		@model.get('news').set('category', event.target.value)
 
 	priorityChanged: (event) ->
-		@model.get('news').set('priority', event.target.value)
+		console.log parseInt(event.target.value)
+		@model.get('news').set('priority', parseInt(event.target.value))
 
 	langChanged: (event) ->
 		@model.get('news').set('lang', event.target.value)
@@ -113,6 +114,7 @@ module.exports = class NewsCreateView extends View
 		@model.get("input-application-icon-data")
 
 	submit: ->
+		console.log @model.get('news')
 		newsPtr = @model.get('news')
 		newsPtr.set('description', $('#input-description').html())  
 		newsPtr.save(null, {
