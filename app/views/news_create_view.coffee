@@ -49,6 +49,7 @@ module.exports = class NewsCreateView extends View
 		'change input#input-application-version': 'applicationVersionChanged'
 		'change input#input-application-price': 'applicationPriceChanged'
 		'change input#input-application-ranking': 'applicationRankingChanged'
+		'change textarea#input-preview': 'previewChanged'
 		'change select#input-category': 'categoryChanged'
 		'change select#input-priority': 'priorityChanged'
 		'change select#input-lang': 'langChanged'
@@ -69,6 +70,9 @@ module.exports = class NewsCreateView extends View
 	originUrlChanged: (event) ->
 		@model.get('news').set('originUrl', event.target.value)
 
+	previewChanged: (event) ->
+		@model.get('news').set('preview', event.target.value)
+
 	tagsChanged: (event) ->
 		@model.get('news').set('tags', event.target.value)
 
@@ -79,7 +83,6 @@ module.exports = class NewsCreateView extends View
 		@model.get('news').set('category', event.target.value)
 
 	priorityChanged: (event) ->
-		console.log parseInt(event.target.value)
 		@model.get('news').set('priority', parseInt(event.target.value))
 
 	langChanged: (event) ->
@@ -92,7 +95,6 @@ module.exports = class NewsCreateView extends View
 		@model.get('news').set('applicationName', event.target.value)
 
 	applicationAppStoreIdChanged: (event) ->
-		alert(event.target.value)
 		@model.get('news').set('applicationAppStoreId', event.target.value)
 
 	applicationTypeChanged: (event) ->
