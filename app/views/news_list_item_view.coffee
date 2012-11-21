@@ -43,10 +43,6 @@ module.exports = class NewsListItemView extends View
 
 	initialize: ->
 		super
-		Handlebars.registerHelper('newsImage', (block) =>
-			return '#' unless @model.get('image')
-			@model.get('image').get('image').url
-		)
 		Handlebars.registerHelper('formatedCreationDate', (block) =>
 			@model.createdAt.substring(0, 10)
 		)

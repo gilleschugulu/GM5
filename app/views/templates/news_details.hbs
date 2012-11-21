@@ -94,7 +94,7 @@
     <div class="span5">
       <label>Image associe au titre</label>
       <input type="file" id="input-news-image">
-      <img id="input-news-image-preview" src="{{newsImage}}" alt="News image preview" />
+      <img id="input-news-image-preview" src="{{news.attributes.image.url}}" alt="News image preview" />
     </div>
   </div>
   <br>
@@ -120,7 +120,7 @@
     <div class="span4">
       <label>Icon</label>
       <input type="file" id="input-application-icon">
-      <img id="input-application-icon-preview" src="{{applicationIconUrl}}" alt="Application's icon preview" />
+      <img id="input-application-icon-preview" src="{{news.attributes.applicationIcon.url}}" alt="Application's icon preview" />
     </div>
   </div>
   <br>

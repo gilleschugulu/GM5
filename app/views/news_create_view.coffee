@@ -13,14 +13,6 @@ module.exports = class NewsCreateView extends View
 
 	initialize: ->
 		super
-		Handlebars.registerHelper('applicationIconUrl', (block) =>
-			return '#' unless @model.get('news').get('applicationIcon')
-			@model.get('news').get('applicationIcon').get('image').url
-		)
-		Handlebars.registerHelper('newsImage', (block) =>
-			return '#' unless @model.get('news').get('image')
-			@model.get('news').get('image').get('image').url
-		)
 		Handlebars.registerHelper('isSelectedSection', (section, block) =>
 			if @model.get('news').get('section') and section.id == @model.get('news').get('section').id then block(section) else block.inverse(section)
 		)
@@ -115,31 +107,25 @@ module.exports = class NewsCreateView extends View
 	getApplicationIcon: ->
 		@model.get("input-application-icon-data")
 
+	uploadImageWithAttributeName: (news, data, name) ->
+		File.upload data,
+			success: (file) =>
+				news.set(name, file)
+				news.save null,
+					success: (news) =>
+						@publishEvent 'newsHasBeenUpdated'
+
 	submit: ->
-		console.log @model.get('news')
-		newsPtr = @model.get('news')
-		newsPtr.set('description', $('#input-description').html())  
-		newsPtr.save(null, {
+		news = @model.get('news')
+		news.set('description', $('#input-description').html())  
+		news.save(null, {
 			success: (news) =>
 				if @getNewsImage()
-					newsImageFile = new File()
-					newsImageFile.data = @getNewsImage()
-					newsImageFile.upload({
-						success: =>
-							newsPtr.set('image', newsImageFile)
-							newsPtr.save(null)
-					}) 
+					@uploadImageWithAttributeName(news, @getNewsImage(), 'image2')
 				if @getApplicationIcon()
-					applicationIconFile = new File()
-					applicationIconFile.data = @getApplicationIcon()
-					applicationIconFile.upload({
-						success: =>
-							newsPtr.set('applicationIcon', applicationIconFile)
-							newsPtr.save(null)
-					}) 
+					@uploadImageWithAttributeName(news, @getApplicationIcon(), 'applicationIcon2')
 
 				@publishEvent '!startupController', 'news', 'index'
-
 			error: (news, error) ->
 				alert(error.message)
 		})

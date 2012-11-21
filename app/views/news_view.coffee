@@ -12,6 +12,7 @@ module.exports = class NewsView extends View
 
 	initialize: -> 
 		super
+		@subscribeEvent 'newsHasBeenUpdated', @refresh
 
 	add_news_item: (news) -> 
 		row = new NewsListItemView(model: news)
@@ -26,7 +27,7 @@ module.exports = class NewsView extends View
 		@refresh()
 
 	refresh: ->
-		new Parse.Query(News).include(['image', 'section', 'source']).find({
+		new Parse.Query(News).include(['section', 'source']).find({
 			success: (news) =>
 				@model = new Model(news: news)
 				@reload_data()

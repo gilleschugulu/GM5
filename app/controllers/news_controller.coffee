@@ -25,7 +25,7 @@ module.exports = class NewsController extends Controller
 			success: (sections) =>
 				new Parse.Query(Source).find({
 					success: (sources) =>
-						new Parse.Query(News).include(['applicationIcon', 'image']).get(params.id, {
+						new Parse.Query(News).get(params.id, {
 							success: (news) =>
 								@view = new NewsCreateView(
 									model: new Model({
