@@ -121,9 +121,9 @@ module.exports = class NewsCreateView extends View
 		news.save(null, {
 			success: (news) =>
 				if @getNewsImage()
-					@uploadImageWithAttributeName(news, @getNewsImage(), 'image2')
+					@uploadImageWithAttributeName(news, @getNewsImage(), 'image')
 				if @getApplicationIcon()
-					@uploadImageWithAttributeName(news, @getApplicationIcon(), 'applicationIcon2')
+					@uploadImageWithAttributeName(news, @getApplicationIcon(), 'applicationIcon')
 
 				@publishEvent '!startupController', 'news', 'index'
 			error: (news, error) ->
