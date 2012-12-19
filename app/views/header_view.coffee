@@ -19,7 +19,9 @@ module.exports = class HeaderView extends View
 		@subscribeEvent 'loginStatus', @render
 		@subscribeEvent 'startupController', @render
 		Handlebars.registerHelper('isLoggedIn', (block) =>
-			block() if mediator.user
+			console.log 'ici'
+			if mediator.user then block()
+			console.log 'ici2'
 		)
 
 	logout: ->
