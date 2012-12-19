@@ -53,5 +53,5 @@ module.exports = class NewsListItemView extends View
 				when @model.get('priority') == 3 then 'High'
 		)
 		Handlebars.registerHelper('isActive', (block) =>
-			if @model.get('active') then block(@) else block.inverse(@)
+			if @model.get('active') then block.fn(@) else block.inverse(@)
 		)

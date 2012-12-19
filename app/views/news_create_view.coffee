@@ -14,19 +14,19 @@ module.exports = class NewsCreateView extends View
 	initialize: ->
 		super
 		Handlebars.registerHelper('isSelectedSection', (section, block) =>
-			if @model.get('news').get('section') and section.id == @model.get('news').get('section').id then block(section) else block.inverse(section)
+			if @model.get('news').get('section') and section.id == @model.get('news').get('section').id then block.fn(section) else block.inverse(section)
 		)
 		Handlebars.registerHelper('isSelectedSource', (source, block) =>
-			if @model.get('news').get('source') and source.id == @model.get('news').get('source').id then block(source) else block.inverse(source)
+			if @model.get('news').get('source') and source.id == @model.get('news').get('source').id then block.fn(source) else block.inverse(source)
 		)
 		Handlebars.registerHelper('isSelectedCategory', (category, block) =>
-			if @model.get('news').get('category') == category.value then block(category) else block.inverse(category)
+			if @model.get('news').get('category') == category.value then block.fn(category) else block.inverse(category)
 		)
 		Handlebars.registerHelper('isSelectedPriority', (priority, block) =>
-			if @model.get('news').get('priority') == priority.value then block(priority) else block.inverse(priority)
+			if @model.get('news').get('priority') == priority.value then block.fn(priority) else block.inverse(priority)
 		)
 		Handlebars.registerHelper('isSelectedLanguage', (language, block) =>
-			if @model.get('news').get('lang') == language.value then block(language) else block.inverse(language)
+			if @model.get('news').get('lang') == language.value then block.fn(language) else block.inverse(language)
 		)
 
 	events: ->
