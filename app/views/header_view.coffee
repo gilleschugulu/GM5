@@ -3,27 +3,27 @@ template = require 'views/templates/header'
 mediator = require 'mediator'
 
 module.exports = class HeaderView extends View
-  template: template
-  id: 'header'
-  className: 'header'
-  container: '#header-container'
-  autoRender: true
+	template: template
+	id: 'header'
+	className: 'header'
+	container: '#header-container'
+	autoRender: true
 
-  events: ->
-  	"click #logout": "logout"
+	events: ->
+		"click #logout": "logout"
 #  	"click #create-news": "createNews"
 #  	"click #list-news": "listNews"
 
-  initialize: ->
-    super
-    @subscribeEvent 'loginStatus', @render
-    @subscribeEvent 'startupController', @render
-    Handlebars.registerHelper('isLoggedIn', (block) ->
-      console.log block
-    	block() if mediator.user)
+	initialize: ->
+		super
+		@subscribeEvent 'loginStatus', @render
+		@subscribeEvent 'startupController', @render
+		Handlebars.registerHelper('isLoggedIn', (block) =>
+			block() if mediator.user
+		)
 
-  logout: ->
-  	@publishEvent 'logout'
+	logout: ->
+		@publishEvent 'logout'
 
 #  createNews: ->
 #  	@publishEvent 'createNews'
