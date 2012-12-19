@@ -115,9 +115,39 @@ module.exports = class NewsCreateView extends View
 					success: (news) =>
 						@publishEvent 'newsHasBeenUpdated'
 
+# - recupere & strip html
+# - recupere text
+# - set news_text_legal_limit_length (en taille) du text a recupere (10% de text)
+
+# => pour html_limit = 10 % du html
+# => tant que le texte present dans range(0, html_limit) < news_text_limit_percentage
+# => html_limit += 5%
+
+# - set html_limit -= 5%
+# - set legal_html = range(0, html_limit)
+
+	fixedHTML: (html) ->
+		d = document.createElement('div')
+		d.innerHTML = html
+		d.innerHTML
+
+	getTextFromHTML: (html) ->
+		html.replace(/<(.)*?>/gm, '').replace(/<(.)*/, '') # TODO: refactor regex to remote html AND invalid html
+
+	getNewsDescription: ->
+		$('#input-description').html()
+
+	getLegalNewsDescription: ->
+		newsContentHTML = @getNewsDescription()
+		newsContentTextLegalLimit = @getTextFromHTML(@getNewsDescription()).length * 0.2
+		for newsContentLegalLimitationModifier in [0.05..1] by 0.025
+			newsContentHTMLLegal = newsContentHTML.substring(0, newsContentHTML.length * newsContentLegalLimitationModifier)
+			return @fixedHTML(newsContentHTMLLegal) if @getTextFromHTML(newsContentHTMLLegal).length > newsContentTextLegalLimit
+
 	submit: ->
 		news = @model.get('news')
-		news.set('description', $('#input-description').html())  
+		news.set('description', @getNewsDescription())  
+		news.set('legalDescription', @getLegalNewsDescription())
 		news.save(null, {
 			success: (news) =>
 				if @getNewsImage()
