@@ -44,7 +44,7 @@ module.exports = class NewsListItemView extends View
 	initialize: ->
 		super
 		Handlebars.registerHelper('formatedCreationDate', (block) =>
-			@model.createdAt.substring(0, 10)
+			@model.get('publishedAt').toString().substring(0, 10)
 		)
 		Handlebars.registerHelper('formatedPriority', (block) =>
 			switch

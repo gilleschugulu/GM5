@@ -35,6 +35,7 @@ module.exports = class NewsCreateView extends View
 		'change input#input-origin-url': 'originUrlChanged'
 		'change input#input-tags': 'tagsChanged'
 		'change input#input-title': 'titleChanged'
+		'change input#input-published-at': 'publishedAtChanged'
 		'change input#input-application-name': 'applicationNameChanged'
 		'change input#input-application-appstore-id': 'applicationAppStoreIdChanged'
 		'change input#input-application-type': 'applicationTypeChanged'
@@ -70,6 +71,9 @@ module.exports = class NewsCreateView extends View
 
 	titleChanged: (event) ->
 		@model.get('news').set('title', event.target.value)
+
+	publishedAtChanged: (event) ->
+		@model.get('news').set('publishedAt', $(event.target).datepicker('getDate'))
 
 	categoryChanged: (event) ->
 		@model.get('news').set('category', event.target.value)
@@ -148,6 +152,8 @@ module.exports = class NewsCreateView extends View
 		news = @model.get('news')
 		news.set('description', @getNewsDescription())  
 		news.set('legalDescription', @getLegalNewsDescription())
+		# Set default publication date to today
+		news.set('publishedAt', new Date()) unless news.get('publishedAt')
 		news.save(null, {
 			success: (news) =>
 				if @getNewsImage()
@@ -162,6 +168,9 @@ module.exports = class NewsCreateView extends View
 
 	afterRender: ->
 		super
+		formatedPublicationDate = moment(@model.get('news').get('publishedAt')).format('YYYY/MM/DD') if @model.get('news').get('publishedAt')
+		$('#input-published-at').datepicker(dateFormat: 'yy/mm/dd')
+		$('#input-published-at').datepicker("setDate", if formatedPublicationDate then formatedPublicationDate else new Date());
 		$('#input-description').tinymce({
 			# Location of TinyMCE script
 			script_url: '/tiny_mce/tiny_mce.js'
