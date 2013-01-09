@@ -143,10 +143,10 @@ module.exports = class NewsCreateView extends View
 
 	getLegalNewsDescription: ->
 		newsContentHTML = @getNewsDescription()
-		newsContentTextLegalLimit = @getTextFromHTML(@getNewsDescription()).length * 0.2
+		newsContentTextLegalLimit = @getTextFromHTML(@getNewsDescription()).length * 0.33
 		for newsContentLegalLimitationModifier in [0.05..1] by 0.025
 			newsContentHTMLLegal = newsContentHTML.substring(0, newsContentHTML.length * newsContentLegalLimitationModifier)
-			return @fixedHTML(newsContentHTMLLegal) if @getTextFromHTML(newsContentHTMLLegal).length > newsContentTextLegalLimit
+			return @fixedHTML("#{newsContentHTMLLegal}...") if @getTextFromHTML(newsContentHTMLLegal).length > newsContentTextLegalLimit
 
 	submit: ->
 		news = @model.get('news')
