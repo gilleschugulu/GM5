@@ -152,8 +152,20 @@ module.exports = class NewsCreateView extends View
 		news = @model.get('news')
 		news.set('description', @getNewsDescription())  
 		news.set('legalDescription', @getLegalNewsDescription())
-		# Set default publication date to today
-		news.set('publishedAt', new Date()) unless news.get('publishedAt')
+		
+		# TODO: refactor, use library to work well with stupid javascript dates....
+		# Set default publication date to today and ajust to 00:00 for hours because we want to discard the time
+		# need UTC date set to 00:00
+		publishedAt = news.get('publishedAt') || new Date()
+		publishedAt.setHours(1)
+		publishedAt.setMinutes(0)
+		publishedAt.setSeconds(0)
+		publishedAt.setMilliseconds(0)
+
+		alert(publishedAt)
+
+		news.set('publishedAt', publishedAt)
+
 		news.save(null, {
 			success: (news) =>
 				if @getNewsImage()

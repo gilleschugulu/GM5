@@ -4,8 +4,6 @@ Parse.Cloud.beforeSave('News', function(request, response) {
 		response.error('A title must be set')
 	} else if (!request.object.get('section')) {		
 		response.error('A section must be choosen')
-	} else if (!request.object.get('originUrl')) {
-		response.error('An origin url must be set')
 	} else if (!request.object.get('tags')) {
 		response.error('At least one tag must be set')
 	} else if (!request.object.get('section')) {

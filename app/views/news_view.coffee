@@ -29,6 +29,16 @@ module.exports = class NewsView extends View
 	refresh: ->
 		new Parse.Query(News).include(['section', 'source']).find({
 			success: (news) =>
+				for news_object in news
+					# Set default publication date to today and ajust to 00:00 for hours because we want to discard the time
+					publishedAt = news_object.get('publishedAt') || new Date()
+					publishedAt.setHours(1)
+					publishedAt.setMinutes(0)
+					publishedAt.setSeconds(0)
+					publishedAt.setMilliseconds(0)
+					news_object.set('publishedAt', publishedAt)
+					news_object.save(null)
+
 				@model = new Model(news: news)
 				@reload_data()
 		})
