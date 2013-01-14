@@ -162,8 +162,6 @@ module.exports = class NewsCreateView extends View
 		publishedAt.setSeconds(0)
 		publishedAt.setMilliseconds(0)
 
-		alert(publishedAt)
-
 		news.set('publishedAt', publishedAt)
 
 		news.save(null, {

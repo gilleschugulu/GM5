@@ -27,7 +27,7 @@ module.exports = class NewsView extends View
 		@refresh()
 
 	refresh: ->
-		new Parse.Query(News).include(['section', 'source']).find({
+		new Parse.Query(News).include(['section', 'source']).descending('createdAt').find({
 			success: (news) =>
 				@model = new Model(news: news)
 				@reload_data()
