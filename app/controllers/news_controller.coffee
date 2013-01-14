@@ -13,11 +13,11 @@ mediator = require 'mediator'
 module.exports = class NewsController extends Controller
 
 	historyURL: (params) ->
-		if params.id then "news/#{params.id}" else 'news'
+		if params.id then "news/#{params.id}" else 'news?page=1'
 
-	index: ->
+	index: (params) ->
 		return @redirectTo 'portal' unless mediator.user
-		@view = new NewsView()
+		@view = new NewsView(model: new Model(page: params.page - 1 || 0))
 
 	show: (params) ->
 		return @redirectTo 'portal' unless mediator.user

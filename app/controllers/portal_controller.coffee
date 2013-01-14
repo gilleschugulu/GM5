@@ -23,7 +23,7 @@ module.exports = class PortalController extends Controller
 	loginSuccess: (user) ->
 		@publishEvent('loginEnded')
 		mediator.user = user
-		@redirectTo('news')
+		@redirectTo('news?page=1')
 
 	loginFail: (error) ->
 		@publishEvent('loginEnded')

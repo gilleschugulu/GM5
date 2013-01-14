@@ -10,6 +10,8 @@ module.exports = class NewsView extends View
 	container: '#page-container'
 	autoRender: true
 
+	perPage: 15
+
 	initialize: -> 
 		super
 		@subscribeEvent 'newsHasBeenUpdated', @refresh
@@ -27,7 +29,8 @@ module.exports = class NewsView extends View
 		@refresh()
 
 	refresh: ->
-		new Parse.Query(News).include(['section', 'source']).descending('createdAt').find({
+		from = @model.get('page') * @perPage
+		new Parse.Query(News).skip(from).limit(@perPage).include(['section', 'source']).descending('createdAt').find({
 			success: (news) =>
 				@model = new Model(news: news)
 				@reload_data()
