@@ -12,12 +12,17 @@ mediator = require 'mediator'
 
 module.exports = class NewsController extends Controller
 
+	perPage: 10
+
 	historyURL: (params) ->
 		if params.id then "news/#{params.id}" else 'news?page=1'
 
 	index: (params) ->
 		return @redirectTo 'portal' unless mediator.user
-		@view = new NewsView(model: new Model(page: params.page - 1 || 0))
+		new Parse.Query(News).count 
+			success: (count) =>
+				pages = count / @perPage
+				@view = new NewsView(model: new Model(page: params.page - 1 || 0, pages: pages, per: @perPage))
 
 	show: (params) ->
 		return @redirectTo 'portal' unless mediator.user

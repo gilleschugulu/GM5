@@ -10,28 +10,42 @@ module.exports = class NewsView extends View
 	container: '#page-container'
 	autoRender: true
 
-	perPage: 15
-
 	initialize: -> 
 		super
 		@subscribeEvent 'newsHasBeenUpdated', @refresh
+		Handlebars.registerHelper 'pagination', =>
+			html = ""
+			for page in [1..@model.get('pages')]
+				if page == @model.get('page') + 1
+					html += "<li class=\"active\"><a href=\"/news?page=#{page}\">#{page}</a></li>"
+				else
+					html += "<li><a href=\"/news?page=#{page}\">#{page}</a></li>"					
+			return new Handlebars.SafeString(html)
 
-	add_news_item: (news) -> 
+	addNewsItem: (news) -> 
 		row = new NewsListItemView(model: news)
 		$("#news_list").append(row.render().el);
 
-	reload_data: ->
+	reloadData: ->
 		$("#news_list > tbody").empty()
-		@add_news_item(news) for news in @model.get('news')
+		@addNewsItem(news) for news in @model.get('news')
+
+	newsDidLoad: ->
+		$('#news-loader').fadeOut complete: ->
+			$('#news_list').fadeIn()
+			$('#news-pagination').fadeIn()	
 
 	afterRender: ->
 		super
+		$('#news_list').hide()
+		$('#news-pagination').hide()
 		@refresh()
 
 	refresh: ->
-		from = @model.get('page') * @perPage
-		new Parse.Query(News).skip(from).limit(@perPage).include(['section', 'source']).descending('createdAt').find({
+		from = @model.get('page') * @model.get('per')
+		new Parse.Query(News).skip(from).limit(@model.get('per')).include(['section', 'source']).descending('createdAt').find({
 			success: (news) =>
-				@model = new Model(news: news)
-				@reload_data()
+				@model.set('news', news)
+				@reloadData()
+				@newsDidLoad()
 		})

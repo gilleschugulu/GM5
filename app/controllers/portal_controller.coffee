@@ -27,4 +27,4 @@ module.exports = class PortalController extends Controller
 
 	loginFail: (error) ->
 		@publishEvent('loginEnded')
-		alert(error.message)
+		alert(error.message)	
