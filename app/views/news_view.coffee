@@ -8,7 +8,6 @@ NewsListItemView = require 'views/news_list_item_view'
 module.exports = class NewsView extends View
 	template: template
 	container: '#page-container'
-	autoRender: true
 
 	initialize: -> 
 		super

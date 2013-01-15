@@ -23,6 +23,7 @@ module.exports = class NewsController extends Controller
 			success: (count) =>
 				pages = count / @perPage
 				@view = new NewsView(model: new Model(page: params.page - 1 || 0, pages: pages, per: @perPage))
+				@view.render()
 
 	show: (params) ->
 		return @redirectTo 'portal' unless mediator.user
