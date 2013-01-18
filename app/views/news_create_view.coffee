@@ -150,8 +150,13 @@ module.exports = class NewsCreateView extends View
 
 	submit: ->
 		news = @model.get('news')
-		news.set('description', @getNewsDescription())  
-		news.set('legalDescription', @getLegalNewsDescription())
+		news.set('description', @getNewsDescription()) 
+
+		# if coups de coeurs || best ever, don't crop description				
+		if news.get('section').id is 'Zytx8X61em' or news.get('section').id is '5RrmrJOtYY'
+			news.set('legalDescription', @getNewsDescription())			
+		else		
+			news.set('legalDescription', @getLegalNewsDescription())
 		
 		# TODO: refactor, use library to work well with stupid javascript dates....
 		# Set default publication date to today and ajust to 00:00 for hours because we want to discard the time
