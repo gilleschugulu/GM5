@@ -143,7 +143,7 @@ module.exports = class NewsCreateView extends View
 
 	getLegalNewsDescription: ->
 		newsContentHTML = @getNewsDescription()
-		newsContentTextLegalLimit = @getTextFromHTML(@getNewsDescription()).length * 0.33
+		newsContentTextLegalLimit = @getTextFromHTML(@getNewsDescription()).length * 0.2
 		for newsContentLegalLimitationModifier in [0.05..1] by 0.025
 			newsContentHTMLLegal = newsContentHTML.substring(0, newsContentHTML.length * newsContentLegalLimitationModifier)
 			return @fixedHTML("#{newsContentHTMLLegal}...") if @getTextFromHTML(newsContentHTMLLegal).length > newsContentTextLegalLimit
@@ -157,7 +157,8 @@ module.exports = class NewsCreateView extends View
 			news.set('legalDescription', @getNewsDescription())			
 		else		
 			news.set('legalDescription', @getLegalNewsDescription())
-		
+	
+
 		# TODO: refactor, use library to work well with stupid javascript dates....
 		# Set default publication date to today and ajust to 00:00 for hours because we want to discard the time
 		# need UTC date set to 00:00
