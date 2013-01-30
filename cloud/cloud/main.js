@@ -26,12 +26,18 @@ Parse.Cloud.beforeSave('News', function(request, response) {
 });
 
 Parse.Cloud.define("search", function(request, response) {
+
+  var sourceQuery = new Parse.Query('Source').matches('name', request.params.query, 'i')
+  var sectionQuery = new Parse.Query('Section').matches('name', request.params.query, 'i')
+
   var query = Parse.Query.or(
     new Parse.Query('News').matches('description', request.params.query, 'i'),
     new Parse.Query('News').matches('title', request.params.query, 'i'),
     new Parse.Query('News').matches('tags', request.params.query, 'i'),
     new Parse.Query('News').matches('category', request.params.query, 'i'),
-    new Parse.Query('News').matches('application_type', request.params.query, 'i')
+    new Parse.Query('News').matches('application_type', request.params.query, 'i'),
+    new Parse.Query('News').matchesQuery('source', sourceQuery),
+    new Parse.Query('News').matchesQuery('section', sectionQuery)
   );
 
   query.include(['section', 'source']).descending('createdAt')

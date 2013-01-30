@@ -18,7 +18,6 @@ module.exports = class HttpClient
     @customRequestHeaders = options?.customRequestHeaders
 
   post: (path, params, callbacks) ->
-    console.log @customRequestHeaders
     HTTPHelper.request "#{@url}/#{path}", params, 'POST',
       headers: => @customRequestHeaders
       success: (object) ->
@@ -43,8 +42,6 @@ module.exports = class HttpClient
         callbacks?.error error if callbacks?.error
 
   delete: (path, params, callbacks) ->
-    alert @url
-    alert "#{@url}/#{path}"
     HTTPHelper.request "#{@url}/#{path}", params, 'DELETE',
       headers: => @customRequestHeaders
       success: (object) ->

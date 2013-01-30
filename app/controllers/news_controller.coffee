@@ -34,7 +34,7 @@ module.exports = class NewsController extends Controller
         @view.model.set('news', news)
         @view.reloadData()
       error: (error) =>
-        alert(error)
+        console.error error
 
   index: (params) ->
     return @redirectTo 'portal' unless mediator.user
@@ -50,11 +50,15 @@ module.exports = class NewsController extends Controller
 
         # Create the view
         @view = new NewsView model: new Model(page: page, pages: pages)
+        @view.render()
 
-        # Bind delegation methods
+        # Bind actions
         @view.delegate 'submit', '#news-search-form', (event) =>
           event.preventDefault()
           @search $('#news-search-input').val()
+
+        # @view.delegate 'change', '#news-search-input', (event) =>
+        #   @search $('#news-search-input').val()
 
         # Display loading while fetching news
         @view.showLoading()

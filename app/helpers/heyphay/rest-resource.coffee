@@ -7,7 +7,6 @@ module.exports = class RestResource
   constructor: (@name, @client) ->
 
   create: (user, callbacks) ->
-    alert "#{@name}.json"
     @client.post "#{@name}.json", {user}, callbacks
 
   update:  (object_id, user, callbacks) ->

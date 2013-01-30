@@ -9,7 +9,6 @@ Section = require 'models/section'
 module.exports = class NewsView extends View
   template: template
   container: '#page-container'
-  autoRender: true
 
   initialize: ->
     super
@@ -26,12 +25,10 @@ module.exports = class NewsView extends View
       return new Handlebars.SafeString(html)
 
   addNewsItem: (news) ->
-    console.log news
     row = new NewsListItemView(model: news)
     $("#news_list").append(row.render().el);
 
   reloadData: ->
-    console.log 'reloadData'
     $("#news_list > tbody").empty()
     @addNewsItem(news) for news in @model.get('news')
     @newsDidLoad()
