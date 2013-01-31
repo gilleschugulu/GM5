@@ -1,9 +1,33 @@
 <legend>News List</legend>
 <form class="form-search" id="news-search-form">
   <div class="input-append">
-    <input id="news-search-input" type="text" class="span11 search-query">
+    <input name="queryString" id="news-search-input" type="text" class="span11 search-query">
     <button type="submit" class="btn">Search</button>
   </div>
+  <div class="checkbox inline">
+  Search in:
+</div>
+  <label class="checkbox inline">
+  <input name="search_titles" type="checkbox" id="inlineCheckbox1" value="1" checked> Titles
+</label>
+<label class="checkbox inline">
+  <input name="search_contents" type="checkbox" id="inlineCheckbox2" value="1" checked> Contents
+</label>
+<label class="checkbox inline">
+  <input name="search_tags" type="checkbox" id="inlineCheckbox2" value="1" checked> Tags
+</label>
+<label class="checkbox inline">
+  <input name="search_sections" type="checkbox" id="inlineCheckbox3" value="1" checked> Sections
+</label>
+<label class="checkbox inline">
+  <input name="search_sources" type="checkbox" id="inlineCheckbox3" value="1" checked> Sources
+</label>
+<label class="checkbox inline">
+  <input name="search_categories" type="checkbox" id="inlineCheckbox2" value="1" checked> Categories
+</label>
+<label class="checkbox inline">
+  <input name="search_app_types" type="checkbox" id="inlineCheckbox2" value="1" checked> Application types
+</label>
 </form>
 <table id="news_list" class="table table-hover">
 	<thead>

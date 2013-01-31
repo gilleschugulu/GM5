@@ -25,22 +25,35 @@ Parse.Cloud.beforeSave('News', function(request, response) {
   }
 });
 
-Parse.Cloud.define("search", function(request, response) {
+Parse.Cloud.define("search", function(request, response){
+  var queries = []
 
-  var sourceQuery = new Parse.Query('Source').matches('name', request.params.query, 'i')
-  var sectionQuery = new Parse.Query('Section').matches('name', request.params.query, 'i')
+  // If search into sections relation
+  if (request.params.search_sections) {
+    sectionQuery = new Parse.Query('Section').matches('name', request.params.queryString, 'i')
+    queries.push(new Parse.Query('News').matchesQuery('section', sectionQuery));
+  }
 
-  var query = Parse.Query.or(
-    new Parse.Query('News').matches('description', request.params.query, 'i'),
-    new Parse.Query('News').matches('title', request.params.query, 'i'),
-    new Parse.Query('News').matches('tags', request.params.query, 'i'),
-    new Parse.Query('News').matches('category', request.params.query, 'i'),
-    new Parse.Query('News').matches('application_type', request.params.query, 'i'),
-    new Parse.Query('News').matchesQuery('source', sourceQuery),
-    new Parse.Query('News').matchesQuery('section', sectionQuery)
-  );
+  // If search into sources relation
+  if (request.params.search_sources) {
+    sourceQuery = new Parse.Query('Source').matches('name', request.params.queryString, 'i')
+    queries.push(new Parse.Query('News').matchesQuery('source', sourceQuery));
+  }
 
-  query.include(['section', 'source']).descending('createdAt')
+  if (request.params.search_contents)
+    queries.push(new Parse.Query('News').matches('description', request.params.queryString, 'i'));
+  if (request.params.search_titles)
+    queries.push(new Parse.Query('News').matches('title', request.params.queryString, 'i'));
+  if (request.params.search_tags)
+    queries.push(new Parse.Query('News' ).matches('tags', request.params.queryString, 'i'));
+  if (request.params.search_categories)
+    queries.push(new Parse.Query('News').matches('category', request.params.queryString, 'i'));
+  if (request.params.search_app_types)
+    queries.push(new Parse.Query('News').matches('application_type', request.params.queryString, 'i'));
+
+  var query = Parse.Query.or.apply(null, queries);
+  query.include(['section', 'source']);
+  query.descending('createdAt')
   query.find({
     success: function(results) {
       response.success(results);

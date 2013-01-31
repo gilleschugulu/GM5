@@ -9,7 +9,6 @@ Priority = require 'models/priority'
 Language = require 'models/language'
 Model = require 'models/base/model'
 mediator = require 'mediator'
-HttpClient = require 'helpers/heyphay/http-client'
 
 module.exports = class NewsController extends Controller
 
@@ -18,17 +17,19 @@ module.exports = class NewsController extends Controller
   historyURL: (params) ->
     if params.id then "news/#{params.id}" else 'news?page=1'
 
-  search: (query) ->
+  search: ->
     return @redirectTo 'portal' unless mediator.user
+
+    query = $('#news-search-form').serializeObject()
 
     @view.showLoading()
 
-    client = new HttpClient url: 'https://api.parse.com/1/functions'
+    client = new Pistache.HttpClient url: 'https://api.parse.com/1/functions'
     client.customRequestHeaders =
       'X-Parse-Application-Id': 'HGoHF8NOmWIM8P3XjhcNcRi0euFsiiiRTV0dzkE3',
       'X-Parse-REST-API-Key': '7buOMQUxUWg2kEA0nQZtpvU3kOs9yLW0Jl4YJCfy'
 
-    client.post 'search', {query: query},
+    client.post 'search', query,
       success: (response) =>
         news = (new News(news_data) for news_data in response.result)
         @view.model.set('news', news)
@@ -55,7 +56,7 @@ module.exports = class NewsController extends Controller
         # Bind actions
         @view.delegate 'submit', '#news-search-form', (event) =>
           event.preventDefault()
-          @search $('#news-search-input').val()
+          @search()
 
         # @view.delegate 'change', '#news-search-input', (event) =>
         #   @search $('#news-search-input').val()
