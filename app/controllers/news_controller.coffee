@@ -21,6 +21,7 @@ module.exports = class NewsController extends Controller
     return @redirectTo 'portal' unless mediator.user
 
     query = $('#news-search-form').serializeObject()
+    return if query.queryString.length is 0
 
     @view.showLoading()
 

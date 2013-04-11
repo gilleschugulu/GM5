@@ -6,13 +6,12 @@
   <legend>{{title}}</legend>
   <label>Rubrique</label>
   {{#each sections}}
-	  <label class="radio inline">
       {{#isSelectedSection this}}
         <input type="radio" name="input-section" value="{{id}}" checked> {{attributes.name}}
       {{else}}
 		  	<input type="radio" name="input-section" value="{{id}}"> {{attributes.name}}
       {{/isSelectedSection}}
-	  </label>
+       <br>
   {{/each}}
   <br />
   <br />
