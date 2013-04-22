@@ -122,7 +122,7 @@ module.exports = class NewsController extends Controller
 
     query = new Parse.Query(News)
     query.include ['section', 'source']
-    query.descending 'createdAt'
+    query.descending 'publishedAt'
     query.equalTo 'section', crawledSection
     query.find
       success: (news) =>
