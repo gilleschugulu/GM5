@@ -1,0 +1,20 @@
+<td style="width: 110px"><img src="{{attributes.image.url}}" width="110" height="110"/></td>
+<td style="white-space:nowrap">{{formatedCreationDate}}</td>
+<td style="white-space:nowrap"><span class="label priority-label">{{formatedPriority}}</span></td>
+<td style="width: 400px;">{{attributes.title}}</td>
+<td style="white-space:nowrap">{{attributes.source.attributes.name}}</td>
+<td style="white-space:nowrap">{{attributes.section.attributes.name}}</td>
+<td style="white-space:nowrap">{{attributes.lang}}</td>
+<td style="width: 200px">
+  {{#isActive}}
+    <input type="button" class="btn btn-small btn-success news-actions-status-toggle" value="Active"/>
+  {{else}}
+    <input type="button" class="btn btn-small btn-danger news-actions-status-toggle" value="Inactive"/>
+  {{/isActive}}
+</td>
+<td style="width: 90px">
+  <div id="news-{{id}}-actions" style="width: 100%;height: 100%">
+    <input type="button" class="news-actions-edit btn btn-small btn-block btn-primary" value="Edit"/>
+    <input type="button" class="news-actions-destroy btn btn-small btn-block btn-danger" value="Effacer" confirm="alert('sure?')"/>
+  </div>
+</td>

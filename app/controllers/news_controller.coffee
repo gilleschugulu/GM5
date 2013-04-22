@@ -3,6 +3,7 @@ Section = require 'models/section'
 News = require 'models/news'
 NewsView = require 'views/news_view'
 NewsCreateView = require 'views/news_create_view'
+CrawledNewsListView = require 'views/crawled_news_list_view'
 Source = require 'models/source'
 Category = require 'models/category'
 Priority = require 'models/priority'
@@ -64,8 +65,17 @@ module.exports = class NewsController extends Controller
         # Display loading while fetching news
         @view.showLoading()
 
+        crawledSection = new Section()
+        crawledSection.id = '44bBINITa6'
+
         # Get corresponding page of news
-        new Parse.Query(News).skip(from).limit(@perPage).include(['section', 'source']).descending('createdAt').find({
+        query =  new Parse.Query(News)
+        query.notEqualTo 'section', crawledSection
+        query.skip(from)
+        query.limit(@perPage)
+        query.include(['section', 'source'])
+        query.descending('createdAt')
+        query.find({
           success: (news) =>
             @view.model.set('news', news)
             @view.reloadData()
@@ -95,6 +105,29 @@ module.exports = class NewsController extends Controller
             })
         })
     })
+
+  crawled: ->
+    return @redirectTo 'portal' unless mediator.user
+    crawledSection = new Section()
+    crawledSection.id = '44bBINITa6'
+
+    @view = new CrawledNewsListView model: new Model()
+    # Bind actions
+    @view.delegate 'submit', '#news-search-form', (event) =>
+      event.preventDefault()
+      @search()
+
+    @view.showLoading()
+
+    query = new Parse.Query(News)
+    query.include ['section', 'source']
+    query.descending 'createdAt'
+    query.equalTo 'section', crawledSection
+    query.find
+      success: (news) =>
+        @view.model.set 'news', news
+        @view.reloadData()
+
 
   new: ->
     return @redirectTo 'portal' unless mediator.user
