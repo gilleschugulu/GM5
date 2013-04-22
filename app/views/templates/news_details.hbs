@@ -6,13 +6,12 @@
   <legend>{{title}}</legend>
   <label>Rubrique</label>
   {{#each sections}}
-	  <label class="radio inline">
       {{#isSelectedSection this}}
         <input type="radio" name="input-section" value="{{id}}" checked> {{attributes.name}}
       {{else}}
 		  	<input type="radio" name="input-section" value="{{id}}"> {{attributes.name}}
       {{/isSelectedSection}}
-	  </label>
+       <br>
   {{/each}}
   <br />
   <br />
@@ -108,7 +107,7 @@
   <div class="row">
   	<div class="span12">
   		<label>Description</label>
-  		<textarea id="input-description" rows="15" cols="80">{{news.attributes.description}}</textarea>
+  		<textarea id="inputDescription" rows="15" cols="80">{{news.attributes.description}}</textarea>
   	</div>
   </div>
   <br>

@@ -1,11 +1,11 @@
 
 Parse.Cloud.beforeSave('News', function(request, response) {
-  if (!request.object.get('title')) {
+  if (request.object.get('crowled') == 'true') {
+	response.success();
+  } else if (!request.object.get('title')) {
     response.error('A title must be set')
   } else if (!request.object.get('section')) {
     response.error('A section must be choosen')
-  } else if (!request.object.get('tags')) {
-    response.error('At least one tag must be set')
   } else if (!request.object.get('section')) {
     response.error('Please pick a section')
   } else if (!request.object.get('category')) {
