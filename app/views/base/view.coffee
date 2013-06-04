@@ -5,3 +5,9 @@ module.exports = class View extends Chaplin.View
   # Precompiled templates function initializer.
   getTemplateFunction: ->
     @template
+
+  showLoading: ->
+    $('#page-loader').fadeIn()
+
+  hideLoading: ->
+    $('#page-loader').fadeOut()

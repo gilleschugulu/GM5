@@ -6,3 +6,5 @@ module.exports = (match) ->
   match 'news/new', 'news#new'
   match 'news/:id', 'news#show'
   match 'news/search/:query', 'news#search'
+
+  match 'sources', 'sources#index'

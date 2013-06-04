@@ -1,0 +1,39 @@
+<div class="row span10 well">
+  <legend>Details ({{id}})</legend>
+  <div class="input-prepend btn-block">
+    <span class="add-on">Name</span>
+    <input class="source-name-input" type="text" value="{{attributes.name}}" placeholder="Source's name"/>
+  </div>
+  <div class="input-prepend btn-block">
+    <span class="add-on">URL</span>
+    <input class="source-url-input" type="text" value="{{attributes.URL}}" placeholder="http://"/>
+  </div>
+  <br>
+  <div>
+    <legend>Feeds</legend>
+    {{#if attributes.feeds}}
+      {{#feedList this}}
+        <div class="input-prepend btn-block">
+          <span class="add-on">Feed</span>
+          <input type="text" data-index="{{index}}" class="source-feed-input" value="{{feed}}" placeholder="http://" />   
+          <input type="button" class="destroy-source-feed-button btn btn-small btn-danger" value="-" />
+          {{#isLastFeed source index}}
+             <input type="button" class="add-source-feed-button btn btn-small btn-primary" value="+" />
+          {{/isLastFeed}}
+        </div>
+      {{/feedList}}
+    {{else}}
+      No feeds to crawl. <input type="button" class="add-source-feed-button btn btn-small btn-primary" value="+" />      
+    {{/if}}
+  </div>
+  <br>
+  <div>
+    {{#if id}}
+      <input type="button" class="save-source-button btn btn-primary" value="Save" /> 
+      <input type="button" class="destroy-source-button btn btn-danger" value="Destroy" />
+    {{else}}
+      <input type="button" class="save-source-button btn btn-primary" value="Create" /> 
+      <input type="button" class="destroy-source-button btn btn-danger" value="Cancel" />
+    {{/if}}
+  </div>      
+</div>

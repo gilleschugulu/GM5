@@ -9,5 +9,6 @@ module.exports = class Category extends Model
 			{value: '2', name: 'News'}
 			{value: '3', name: 'Dossier'}
 			{value: '4', name: 'Business'}
-			{value: '5', name: 'Rumeur'}
+      {value: '5', name: 'Rumeur'}
+			{value: '6', name: 'Crowled'}
 		]
