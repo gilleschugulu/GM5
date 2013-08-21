@@ -1,3 +1,40 @@
+# WELCOME
+
+## DEPENDENCIES (git modules)
+
+After first checkout, ensure you have the following installed
+
+- brunch.io ($> npm install brunch)
+- parse CLI (curl -s https://www.parse.com/downloads/cloud_code/installer.sh | sudo /bin/bash) or see https://www.parse.com/docs/cloud_code_guide
+
+Then execute
+
+- $> npm install
+
+## START DB & SERVER
+
+- $> brunch watch -s
+  
+## DEPLOYING
+
+### Back Client
+
+Ensure that you've linked heroku project with your local repository
+(adding heroku's origin)
+
+- $> heroku git:remote -a mobile-game-news
+
+Then you can deploy this way:
+
+- $> git push heroku master
+
+### Parse Cloud Code
+
+The cloud code folder is a the root of the project
+
+- $> cd cloud/
+- $> parse deploy
+
 # Brunch with Chaplin
 ![](https://a248.e.akamai.net/camo.github.com/b7ebb8bbcec7938940cf8e9c441124c3bddafd3a/687474703a2f2f662e636c2e6c792f6974656d732f34373039326b30423141334a317a3166306b34362f6277632e706e67)
 
