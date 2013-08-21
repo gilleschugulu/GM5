@@ -1,6 +1,6 @@
 Model = require 'models/base/model'
 
-module.exports = class News extends Parse.Object
+module.exports = Parse.Object.extend
 	
 	className: 'News'
 

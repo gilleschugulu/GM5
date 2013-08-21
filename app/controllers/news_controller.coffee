@@ -33,7 +33,16 @@ module.exports = class NewsController extends Controller
 
     client.post 'search', query,
       success: (response) =>
-        news = (new News(news_data) for news_data in response.result)
+        news = []
+        # this is so messy, but it will fail if doing simple list
+        # comprehension without removing keys (Parse will yield an
+        # exception)
+        # i.e (new News(news_data) for news_data in response.result)
+        for news_data in response.result
+          delete news_data.__type
+          delete news_data.className
+          console.log news_data
+          news.push new News(news_data)
         @view.model.set('news', news)
         @view.reloadData()
       error: (error) =>

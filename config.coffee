@@ -15,7 +15,7 @@ exports.config =
           'vendor/scripts/jquery-1.8.2.js',
           'vendor/scripts/underscore-1.4.0.js',
           'vendor/scripts/backbone-0.9.2.js',
-          'vendor/scripts/parse-1.1.6.min.js',
+          'vendor/scripts/parse-1.2.9.min.js',
           'vendor/scripts/bootstrap.min.js',
           'vendor/scripts/jquery.switch.min.js'
         ]
