@@ -37,3 +37,12 @@ Handlebars.registerHelper 'without', (context, options) ->
 Handlebars.registerHelper 'with_user', (options) ->
   context = mediator.user or {}
   Handlebars.helpers.with.call(this, context, options)
+
+
+# Truncate string
+Handlebars.registerHelper 'truncate', (str, len) ->
+  if str.length > len
+    new_str = str.substr(0, len + 1) + '...'
+  else
+    new_str = str
+  return new Handlebars.SafeString new_str
