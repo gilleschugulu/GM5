@@ -10,7 +10,7 @@ app.listen(process.env.PORT || 3333);
 
 app.get('/crawl', function(request, response) {
   exec("ruby ./crawler/crawl.rb > ./crawler/crawler.out.log");
-  response.sendfile('public/crawling.html');
+  response.sendfile('public/index.html');
 });
 
 // If static asset requested, serve it directly
