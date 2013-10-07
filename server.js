@@ -1,4 +1,6 @@
 var express = require('express');
+var sys = require('sys');
+var exec = require('child_process').exec;
 
 // Create app server
 var app = express();
@@ -9,6 +11,11 @@ app.listen(process.env.PORT || 3333);
 // If static asset requested, serve it directly
 app.get('/*.(css|js|png|jpg|gif|pdf|htm|html)', function(request, response) {
   response.sendfile('public/' + request.path);
+});
+
+app.get('/crawl', function(request, response) {
+  exec("ruby ./crawler/crawl.rb > ./crawler/crawler.out.log");
+  response.sendfile('public/crawling.html');
 });
 
 // Otherwise, always serve index.html (app container)
