@@ -1,8 +1,9 @@
 class Stuff
+  attr_accessor :a, :b
 
   def initialize opts
-    @a = opts.a
-    @b = opts.b
+    @a = opts[:a]
+    @b = opts[:b]
   end
 
   def compute
@@ -11,7 +12,9 @@ class Stuff
 
 end
 
-a = new Stuff({a: 32, b: 43})
-puts "#{a.a} <=> #{{a.b}}"
+a = Stuff.new({:a => 32, :b => 43})
+puts "#{a.a} <=> #{a.b}"
 a.compute
-puts "#{a.a} <=> #{{a.b}}"
+puts "#{a.a} <=> #{a.b}"
+a.compute
+puts "#{a.a} <=> #{a.b}"
