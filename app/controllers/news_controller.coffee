@@ -41,7 +41,7 @@ module.exports = class NewsController extends Controller
         for news_data in response.result
           delete news_data.__type
           delete news_data.className
-          console.log news_data
+          # console.log news_data
           news.push new News(news_data)
         @view.model.set('news', news)
         @view.reloadData()
