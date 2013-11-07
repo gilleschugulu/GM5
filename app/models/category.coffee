@@ -4,7 +4,7 @@ module.exports = class Category extends Model
 
 	defaults:
 		items: [
-			{value: '', name: 'Selectionner'}
+			{value: '', name: 'Type'}
 			{value: '1', name: 'Test'}
 			{value: '2', name: 'News'}
 			{value: '3', name: 'Dossier'}

@@ -54,7 +54,6 @@ module.exports = class NewsController extends Controller
     # Get number of news
     new Parse.Query(News).count
       success: (count) =>
-
         # Compute news segment
         pages = count / @perPage
         page = params.page - 1 || 0
@@ -141,12 +140,12 @@ module.exports = class NewsController extends Controller
 
   new: ->
     return @redirectTo 'portal' unless mediator.user
-    new Parse.Query(Section).find({
+    new Parse.Query(Section).find
       success: (sections) =>
-        new Parse.Query(Source).find({
+        new Parse.Query(Source).ascending('name').find
           success: (sources) =>
-            @view = new NewsCreateView(
-              model: new Model({
+            @view = new NewsCreateView
+              model: new Model
                 title: 'Create a news'
                 sections: sections
                 sources: sources
@@ -154,8 +153,3 @@ module.exports = class NewsController extends Controller
                 categories: new Category()
                 languages: new Language()
                 priorities: new Priority()
-              })
-            )
-        })
-    })
-
